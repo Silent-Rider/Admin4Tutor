@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class WebServer{
     
     @GetMapping
-    public String getMethodName(@RequestParam String param) {
-        return "Hello, World!";
+    public String displayStartPage(@RequestParam String name) {
+        return String.format("Hello, %s!", name);
     }
 }
