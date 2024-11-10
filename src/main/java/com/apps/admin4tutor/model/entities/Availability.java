@@ -1,0 +1,37 @@
+package com.apps.admin4tutor.model.entities;
+
+import java.sql.Time;
+
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "availability")
+public class Availability {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "tutor_id", nullable = false)
+    private Tutor tutor;
+
+    @Column(name = "day_of_week")
+    private DayOfWeek dayOfWeek;
+
+    @Column(name = "start_time", nullable = false)
+    private Time startTime;
+
+    @Column(name = "end_time", nullable = false)
+    private Time endTime;
+
+    private enum DayOfWeek{
+        MONDAY,
+        TUESDAY,
+        WEDNESDAY,
+        THURSDAY,
+        FRIDAY,
+        SATURDAY,
+        SUNDAY
+    }
+}

@@ -3,7 +3,7 @@ services:
   postgres:
     image: 'postgres:latest'
     environment:
-      POSTGRES_DB: application
+      POSTGRES_DB: tutor_manager_db
       POSTGRES_USER: silent_rider
       POSTGRES_PASSWORD: password
     ports:
