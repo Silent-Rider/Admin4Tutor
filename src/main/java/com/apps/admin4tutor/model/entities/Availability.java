@@ -16,6 +16,7 @@ public class Availability {
     @JoinColumn(name = "tutor_id", nullable = false)
     private Tutor tutor;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "day_of_week")
     private DayOfWeek dayOfWeek;
 

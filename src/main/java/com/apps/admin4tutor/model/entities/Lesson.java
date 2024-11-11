@@ -30,6 +30,7 @@ public class Lesson {
     @Column(name = "end_time", nullable = false)
     private Time endTime;
 
+    @Enumerated(EnumType.STRING)
     private Status status = Status.SCHEDULED;
 
     private enum Status{
