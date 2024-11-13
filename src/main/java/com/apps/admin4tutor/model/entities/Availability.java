@@ -17,7 +17,7 @@ public class Availability {
     private Tutor tutor;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "day_of_week")
+    @Column(name = "day_of_week", columnDefinition = "VARCHAR(9)", nullable = false)
     private DayOfWeek dayOfWeek;
 
     @Column(name = "start_time", nullable = false)

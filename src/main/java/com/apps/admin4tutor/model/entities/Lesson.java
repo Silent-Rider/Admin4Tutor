@@ -3,6 +3,8 @@ package com.apps.admin4tutor.model.entities;
 import java.sql.Date;
 import java.sql.Time;
 
+import com.apps.admin4tutor.model.Language;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -21,6 +23,10 @@ public class Lesson {
     @JoinColumn(name = "tutor_id", nullable = false)
     private Tutor tutor;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, columnDefinition = "VARCHAR(15)")
+    private Language language;
+
     @Column(name = "lesson_date", nullable = false)
     private Date lessonDate;
 
@@ -31,6 +37,7 @@ public class Lesson {
     private Time endTime;
 
     @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "VARCHAR(9)", nullable = false)
     private Status status = Status.SCHEDULED;
 
     private enum Status{

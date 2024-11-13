@@ -2,7 +2,11 @@ package com.apps.admin4tutor.model.entities;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
+import com.apps.admin4tutor.model.Language;
 
 import jakarta.persistence.*;
 
@@ -22,6 +26,12 @@ public class Student {
 
     @Column(nullable = false)
     private String name;
+
+    @ElementCollection
+    @Enumerated(EnumType.STRING)
+    @CollectionTable(name = "student_languages", joinColumns = @JoinColumn(name = "student_id"))
+    @Column(name = "language", columnDefinition = "VARCHAR(15)", nullable = false)
+    private Set <Language> languages = new HashSet<>();
 
     @Column(unique = true)
     private String email;
