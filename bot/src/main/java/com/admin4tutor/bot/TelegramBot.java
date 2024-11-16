@@ -19,6 +19,8 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import com.admin4tutor.bot.handlers.StageHandler;
+
 @Component
 public class TelegramBot extends TelegramLongPollingBot {
 
@@ -26,6 +28,7 @@ public class TelegramBot extends TelegramLongPollingBot {
     private final Map<Long, Stage> userStages = new ConcurrentHashMap<>();
     private final String botToken;
     private final String botUsername;
+    private StageHandler stageHandler;
 
     public TelegramBot(
         @Value("${telegram.bot.token}") String botToken, 
@@ -45,7 +48,8 @@ public class TelegramBot extends TelegramLongPollingBot {
                 askForRole(chatId);
             } else if(userStages.containsKey(chatId)){
                 switch(userStages.get(chatId)){
-                    case ASKING_FOR_ROLE -> System.out.println("");
+                    case ASKING_FOR_ROLE:
+                    userStages.put(chatId, Stage.CHOOSING_LANGUAGE);
                 }
             }
         }
