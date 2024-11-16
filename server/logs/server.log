@@ -506,3 +506,7 @@ Caused by: org.hibernate.tool.schema.spi.SchemaManagementException: Schema-valid
 2024-11-17 02:57:20 - INFO - Tomcat started on port 8080 (http) with context path '/'
 2024-11-17 02:57:24 - INFO - Commencing graceful shutdown. Waiting for active requests to complete
 2024-11-17 02:57:24 - INFO - Graceful shutdown complete
+2024-11-17 05:56:17 - INFO - Tomcat initialized with port 8080 (http)
+2024-11-17 05:56:20 - INFO - Tomcat started on port 8080 (http) with context path '/'
+2024-11-17 05:56:34 - INFO - Commencing graceful shutdown. Waiting for active requests to complete
+2024-11-17 05:56:34 - INFO - Graceful shutdown complete
