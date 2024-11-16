@@ -6,4 +6,4 @@ COPY pom.xml /app
 RUN mvn dependency:go-offline -B
 COPY src /app/src
 RUN mvn clean package -DskipTests
-ENTRYPOINT [ "java", "-jar", "target/bot-1.0.0.jar" ]
+ENTRYPOINT [ "java", "-jar", "target/server-1.0.0.jar" ]
