@@ -1,6 +1,6 @@
 package com.admin4tutor.bot;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -10,15 +10,18 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRemove;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import com.admin4tutor.bot.service.StageHandler;
-import com.admin4tutor.bot.service.AnswerHandler;
+import com.admin4tutor.bot.service.AnswerProcessor;
+import com.admin4tutor.bot.service.SessionManager;
 
 @Component
 public class TelegramBot extends TelegramLongPollingBot {
@@ -26,7 +29,7 @@ public class TelegramBot extends TelegramLongPollingBot {
     private static final Logger logger = LoggerFactory.getLogger(TelegramBot.class);
     private final String botToken;
     private final String botUsername;
-    private final AnswerHandler answerHandler;
+    private final SessionManager sessionManager;
 
     public TelegramBot(
         @Value("${telegram.bot.token}") String botToken, 
@@ -34,7 +37,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         super(new DefaultBotOptions(), botToken);
         this.botToken = botToken;
         this.botUsername = botUsername;
-        this.answerHandler = new AnswerHandler(new StageHandler(this));
+        this.sessionManager = new SessionManager(new AnswerProcessor(this));
     }
     
     @Override
@@ -43,14 +46,18 @@ public class TelegramBot extends TelegramLongPollingBot {
             Message message = update.getMessage();
             long chatId = message.getChatId();
             String text = message.getText();
-            long telegramId = message.getFrom().getId();
-            
+            //long telegramId = message.getFrom().getId();
             if(text.equals("/start")){
-                answerHandler.startSession(chatId);
-                askForRole(chatId);
+                sessionManager.startSession(chatId);
+                startConversation(chatId);
             } else {
-                answerHandler.handleUserAnswer(chatId, text);
+                sessionManager.handleUserAnswer(chatId, text);
             }
+        } else if(update.hasCallbackQuery()){
+            CallbackQuery query = update.getCallbackQuery();
+            long chatId = query.getMessage().getChatId();
+            String text = query.getData();
+            sessionManager.handleUserAnswer(chatId, text);
         }
     }
 
@@ -64,24 +71,27 @@ public class TelegramBot extends TelegramLongPollingBot {
         return botUsername;
     }
 
-    private void askForRole(long chatId){
-        SendMessage message = new SendMessage(String.valueOf(chatId), "Кто вы?");
-        ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
-        keyboardMarkup.setResizeKeyboard(true); // делает клавиатуру компактной
-        keyboardMarkup.setOneTimeKeyboard(true);
-
-        KeyboardRow row = new KeyboardRow(2);
-        row.add(new KeyboardButton("Я студент"));
-        row.add(new KeyboardButton("Я репетитор"));
-
-        List <KeyboardRow> keyboard = new ArrayList<>() {{ add(row); }};
-        keyboardMarkup.setKeyboard(keyboard);
-        message.setReplyMarkup(keyboardMarkup);
-
+    public void sendMessage(long chatId, String text, ReplyKeyboard keyboardMarkup){
+        SendMessage message = new SendMessage(String.valueOf(chatId), text);
+        if(keyboardMarkup != null){
+            message.setReplyMarkup(keyboardMarkup);
+        }
+        else message.setReplyMarkup(new ReplyKeyboardRemove(true));
         try{
             execute(message);
         } catch(TelegramApiException e){
-            logger.error("TelegramApiException occurred during asking user for role");
+            logger.error("TelegramApiException occurred while sending a message to user: {}", chatId, e);
         }
+    }
+
+    private void startConversation(long chatId){
+        ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+        keyboardMarkup.setResizeKeyboard(true); // делает клавиатуру компактной
+        keyboardMarkup.setOneTimeKeyboard(true);
+        KeyboardRow row = new KeyboardRow() {{ add(new KeyboardButton("Я студент"));
+        add(new KeyboardButton("Я репетитор")); }};
+        List <KeyboardRow> keyboard = Collections.singletonList(row);
+        keyboardMarkup.setKeyboard(keyboard);
+        sendMessage(chatId, "Кто вы?", keyboardMarkup);
     }
 }

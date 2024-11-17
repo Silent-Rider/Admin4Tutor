@@ -7,13 +7,13 @@ public class Tutor extends User {
     
     private String biography;
     private final Map<DayOfWeek, String> availability = new ConcurrentHashMap<>(7){{
-        put(DayOfWeek.MONDAY, null);
-        put(DayOfWeek.TUESDAY, null);
-        put(DayOfWeek.WEDNESDAY, null);
-        put(DayOfWeek.THURSDAY, null);
-        put(DayOfWeek.FRIDAY, null);
-        put(DayOfWeek.SATURDAY, null);
-        put(DayOfWeek.SUNDAY, null);
+        put(DayOfWeek.MONDAY, "busy");
+        put(DayOfWeek.TUESDAY, "busy");
+        put(DayOfWeek.WEDNESDAY, "busy");
+        put(DayOfWeek.THURSDAY, "busy");
+        put(DayOfWeek.FRIDAY, "busy");
+        put(DayOfWeek.SATURDAY, "busy");
+        put(DayOfWeek.SUNDAY, "busy");
     }};
     
     public Map<DayOfWeek, String> getAvailability() {

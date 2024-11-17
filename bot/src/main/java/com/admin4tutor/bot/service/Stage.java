@@ -2,8 +2,8 @@ package com.admin4tutor.bot.service;
 
 public enum Stage {
     ASKING_FOR_ROLE,
-    CHOOSING_LANGUAGE,
-    PLANNING_SCHEDULE,
+    ASKING_FOR_LANGUAGE,
+    ASKING_FOR_SCHEDULE,
     ASKING_FOR_NAME,
     ASKING_FOR_EMAIL,
     ASKING_FOR_PHONE_NUMBER,

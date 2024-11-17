@@ -3,13 +3,13 @@ package com.admin4tutor.bot.service;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class AnswerHandler {
+public class SessionManager {
 
     private final Map <Long, UserSession> userSessions = new ConcurrentHashMap<>();
-    private final StageHandler stageHandler;
+    private final AnswerProcessor answerProcessor;
 
-    public AnswerHandler (StageHandler stageHandler){
-        this.stageHandler = stageHandler;
+    public SessionManager (AnswerProcessor answerProcessor){
+        this.answerProcessor = answerProcessor;
     }
 
     public void startSession(long chatId){
@@ -19,9 +19,9 @@ public class AnswerHandler {
     public void handleUserAnswer(long chatId, String answer){
         UserSession session = userSessions.get(chatId);
         switch(session.getStage()){
-            case Stage.ASKING_FOR_ROLE -> System.out.println();
-            case Stage.CHOOSING_LANGUAGE -> System.out.println();
-            case Stage.PLANNING_SCHEDULE -> System.out.println();
+            case Stage.ASKING_FOR_ROLE -> answerProcessor.processRoleAnswer(chatId, answer, session);
+            case Stage.ASKING_FOR_LANGUAGE -> answerProcessor.processLanguageAnswer(chatId, answer, session);
+            case Stage.ASKING_FOR_SCHEDULE -> System.out.println();
             case Stage.ASKING_FOR_NAME -> System.out.println();
             case Stage.ASKING_FOR_EMAIL -> System.out.println();
             case Stage.ASKING_FOR_PHONE_NUMBER -> System.out.println();
