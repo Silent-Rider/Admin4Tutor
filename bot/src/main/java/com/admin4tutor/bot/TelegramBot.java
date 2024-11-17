@@ -2,8 +2,6 @@ package com.admin4tutor.bot;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,16 +17,16 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import com.admin4tutor.bot.handlers.StageHandler;
+import com.admin4tutor.bot.service.StageHandler;
+import com.admin4tutor.bot.service.AnswerHandler;
 
 @Component
 public class TelegramBot extends TelegramLongPollingBot {
 
-    private final Logger logger = LoggerFactory.getLogger(TelegramBot.class);
-    private final Map<Long, Stage> userStages = new ConcurrentHashMap<>();
+    private static final Logger logger = LoggerFactory.getLogger(TelegramBot.class);
     private final String botToken;
     private final String botUsername;
-    private StageHandler stageHandler;
+    private final AnswerHandler answerHandler;
 
     public TelegramBot(
         @Value("${telegram.bot.token}") String botToken, 
@@ -36,6 +34,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         super(new DefaultBotOptions(), botToken);
         this.botToken = botToken;
         this.botUsername = botUsername;
+        this.answerHandler = new AnswerHandler(new StageHandler(this));
     }
     
     @Override
@@ -43,14 +42,14 @@ public class TelegramBot extends TelegramLongPollingBot {
         if(update.hasMessage() && update.getMessage().hasText()) {
             Message message = update.getMessage();
             long chatId = message.getChatId();
-            if(message.getText().equals("/start")){
-                userStages.put(chatId, Stage.ASKING_FOR_ROLE);
+            String text = message.getText();
+            long telegramId = message.getFrom().getId();
+            
+            if(text.equals("/start")){
+                answerHandler.startSession(chatId);
                 askForRole(chatId);
-            } else if(userStages.containsKey(chatId)){
-                switch(userStages.get(chatId)){
-                    case ASKING_FOR_ROLE:
-                    userStages.put(chatId, Stage.CHOOSING_LANGUAGE);
-                }
+            } else {
+                answerHandler.handleUserAnswer(chatId, text);
             }
         }
     }

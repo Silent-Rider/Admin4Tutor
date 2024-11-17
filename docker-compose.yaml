@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   database:
     image: postgres:latest
@@ -33,7 +31,7 @@ services:
     environment:
       TELEGRAM_BOT_USERNAME: tutormanager_bot
       TELEGRAM_BOT_TOKEN: 7869551904:AAEh6CK_NBfY2H8k8emkfIqV6d5aA25SEic
-      SERVER_API_URL: https://localhost:8080
+      SERVER_API_URL: http://server:8080
     networks:
       - admin4tutor-network
 
