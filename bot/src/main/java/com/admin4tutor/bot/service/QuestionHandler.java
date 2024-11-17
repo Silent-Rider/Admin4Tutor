@@ -37,12 +37,12 @@ public class QuestionHandler {
 
     void askForName(long chatId, User user){
         bot.sendMessage(chatId, "Напишите вашу фамилию и имя", null);
-        System.out.println(user.getClass() + " " + user.getLanguage());
+        //System.out.println(user.getClass() + " " + user.getLanguage());
     }
 
     void askForSchedule(long chatId, User user){
         bot.sendMessage(chatId, "Напишите удобное для вас расписание", null);
-        System.out.println(user.getClass() + " " + user.getLanguage());
+        //System.out.println(user.getClass() + " " + user.getLanguage());
     }
 
 }

@@ -30,6 +30,7 @@ public class TelegramBot extends TelegramLongPollingBot {
     private final String botToken;
     private final String botUsername;
     private final SessionManager sessionManager;
+    public ReplyKeyboard currentKeyboard;
 
     public TelegramBot(
         @Value("${telegram.bot.token}") String botToken, 
@@ -75,6 +76,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         SendMessage message = new SendMessage(String.valueOf(chatId), text);
         if(keyboardMarkup != null){
             message.setReplyMarkup(keyboardMarkup);
+            currentKeyboard = keyboardMarkup;
         }
         else message.setReplyMarkup(new ReplyKeyboardRemove(true));
         try{

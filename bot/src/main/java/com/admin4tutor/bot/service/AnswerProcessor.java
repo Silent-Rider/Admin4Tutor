@@ -28,7 +28,7 @@ public class AnswerProcessor {
                 questionHandler.askForLanguage(chatId, session.getUser());
             }
             default -> bot.sendMessage(chatId,
-                        "Пожалуйста, выберите один из предложенных вариантов.", null);
+                        "Пожалуйста, выберите один из предложенных вариантов.", bot.currentKeyboard);
         }
     }
 
@@ -44,7 +44,7 @@ public class AnswerProcessor {
             case "KOREAN" -> session.getUser().setLanguage(answer);
             default -> {
                 bot.sendMessage(chatId,"Пожалуйста, выберите один из предложенных вариантов.",
-                null);
+                bot.currentKeyboard);
                 return;
             }
         }
