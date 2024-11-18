@@ -1,8 +1,11 @@
 package com.admin4tutor.bot.model;
 
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.format.DateTimeFormatter;
+
 public abstract class User {
     
-    private Long id;
     private Long chatId;
     private Long telegramId;
     private String name;
@@ -11,12 +14,6 @@ public abstract class User {
     private String phoneNumber;
     private String dateOfBirth;
     
-    public Long getId() {
-        return id;
-    }
-    public void setId(Long id) {
-        this.id = id;
-    }
     public Long getChatId() {
         return chatId;
     }
@@ -58,5 +55,16 @@ public abstract class User {
     }
     public void setDateOfBirth(String dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
+    }
+
+    public int getAge(){
+        LocalDate date = (LocalDate)DateTimeFormatter.ofPattern("dd.MM.yyyy").parse(dateOfBirth);
+        return Period.between(date, LocalDate.now()).getYears();
+    }
+
+    @Override
+    public String toString(){
+        return name + "\nВозраст: " + getAge() + "\nЯзык: " + language + email == null ? "" : email +
+        phoneNumber == null ? "" : phoneNumber;
     }
 }

@@ -25,8 +25,12 @@ public class SessionManager {
             case Stage.ASKING_FOR_DATE_OF_BIRTH -> answerProcessor.processDateOfBirthAnswer(chatId, answer, session);
             case Stage.ASKING_FOR_AVAILABILITY_DAY -> answerProcessor.processAvailabilityDayAnswer(chatId, answer, session);
             case Stage.ASKING_FOR_AVAILABILITY_INTERVALS -> answerProcessor.processAvailabilityIntervalsAnswer(chatId, answer, session);
-            case Stage.ASKING_FOR_SCHEDULE -> answerProcessor.processScheduleAnswer(chatId, answer, session);
-            case Stage.ASKING_FOR_TUTOR -> System.out.println();
+            case Stage.ASKING_FOR_ANOTHER_AVAILABILITY_DAY -> answerProcessor.processAnotherAvailabilityDayAnswer(chatId, answer, session);
+            case Stage.ASKING_FOR_SCHEDULE_DAY -> answerProcessor.processScheduleDayAnswer(chatId, answer, session);
+            case Stage.ASKING_FOR_SCHEDULE_TIME -> answerProcessor.processScheduleTimeAnswer(chatId, answer, session);
+            case Stage.ASKING_FOR_ANOTHER_SCHEDULE_DAY -> answerProcessor.processAnotherScheduleDayAnswer(chatId, answer, session);
+            case Stage.ASKING_FOR_TUTOR -> answerProcessor.processTutorAnswer(chatId, answer, session);
+            case Stage.VIEWING_TUTOR_PAGE -> answerProcessor.processTutorView(chatId, answer, session);
             case Stage.ASKING_FOR_EMAIL -> System.out.println();
             case Stage.ASKING_FOR_PHONE_NUMBER -> System.out.println();
             case Stage.ASKING_FOR_BIOGRAPHY -> System.out.println();

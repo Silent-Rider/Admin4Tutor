@@ -27,4 +27,9 @@ public class Tutor extends User {
     public void setBiography(String biography) {
         this.biography = biography;
     }
+
+    @Override
+    public String toString(){
+        return super.toString() + "\n" + biography;
+    }
 }

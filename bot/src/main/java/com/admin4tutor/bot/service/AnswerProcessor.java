@@ -10,7 +10,6 @@ public class AnswerProcessor {
     
     private final TelegramBot bot;
     private final QuestionHandler questionHandler;
-    private DayOfWeek currentDayOfWeek;
 
     public AnswerProcessor(TelegramBot bot){
         this.bot = bot;
@@ -30,7 +29,7 @@ public class AnswerProcessor {
                 questionHandler.askForLanguage(chatId, session.getUser());
             }
             default -> bot.sendMessage(chatId,
-                        "Пожалуйста, выберите один из предложенных вариантов", bot.currentKeyboard);
+                        "Пожалуйста, выберите один из предложенных вариантов", session.getCurrentKeyboard());
         }
     }
 
@@ -46,7 +45,7 @@ public class AnswerProcessor {
             case "KOREAN" -> session.getUser().setLanguage(answer);
             default -> {
                 bot.sendMessage(chatId,"Пожалуйста, выберите один из предложенных вариантов",
-                bot.currentKeyboard);
+                session.getCurrentKeyboard());
                 return;
             }
         }
@@ -58,7 +57,7 @@ public class AnswerProcessor {
         if(answer.matches("[А-Яа-я]+? [А-Яа-я]+?")) session.getUser().setName(answer);
         else {
             bot.sendMessage(chatId, "Неверный формат имени. " +
-            "Пожалуйста, введите фамилию и имя через пробел", bot.currentKeyboard);
+            "Пожалуйста, введите фамилию и имя через пробел", session.getCurrentKeyboard());
             return;
         }
         session.setStage(Stage.ASKING_FOR_DATE_OF_BIRTH);
@@ -69,7 +68,7 @@ public class AnswerProcessor {
         if(answer.matches("\\d{2}\\.\\d{2}\\.\\d{4}")) session.getUser().setDateOfBirth(answer);
         else {
             bot.sendMessage(chatId, "Неверный формат даты. " + 
-            "Пожалуйста, напишите вашу дату рождения в формате \"ДД.ММ.ГГГГ\"", bot.currentKeyboard);
+            "Пожалуйста, напишите вашу дату рождения в формате \"ДД.ММ.ГГГГ\"", session.getCurrentKeyboard());
             return;
         }
         User user = session.getUser();
@@ -77,23 +76,23 @@ public class AnswerProcessor {
             session.setStage(Stage.ASKING_FOR_AVAILABILITY_DAY);
             questionHandler.askForAvailabilityDay(chatId);
         } else {
-            session.setStage(Stage.ASKING_FOR_SCHEDULE);
-            questionHandler.askForSchedule(chatId, session.getUser());
+            session.setStage(Stage.ASKING_FOR_SCHEDULE_DAY);
+            questionHandler.askForScheduleDay(chatId, session.getUser());
         }
     }
     
     void processAvailabilityDayAnswer(long chatId, String answer, UserSession session){
         switch(answer) {
-            case "MONDAY" -> currentDayOfWeek = DayOfWeek.MONDAY;
-            case "TUESDAY" -> currentDayOfWeek = DayOfWeek.TUESDAY;
-            case "WEDNESDAY" -> currentDayOfWeek = DayOfWeek.WEDNESDAY;
-            case "THURSDAY" -> currentDayOfWeek = DayOfWeek.THURSDAY;
-            case "FRIDAY" -> currentDayOfWeek = DayOfWeek.FRIDAY;
-            case "SATURDAY" -> currentDayOfWeek = DayOfWeek.SATURDAY;
-            case "SUNDAY" -> currentDayOfWeek = DayOfWeek.SUNDAY;
+            case "MONDAY" -> session.setCurrentDayOfWeek(DayOfWeek.MONDAY);
+            case "TUESDAY" -> session.setCurrentDayOfWeek(DayOfWeek.TUESDAY);
+            case "WEDNESDAY" -> session.setCurrentDayOfWeek(DayOfWeek.WEDNESDAY);
+            case "THURSDAY" -> session.setCurrentDayOfWeek(DayOfWeek.THURSDAY);
+            case "FRIDAY" -> session.setCurrentDayOfWeek(DayOfWeek.FRIDAY);
+            case "SATURDAY" -> session.setCurrentDayOfWeek(DayOfWeek.SATURDAY);
+            case "SUNDAY" -> session.setCurrentDayOfWeek(DayOfWeek.SUNDAY);
             default -> {
                 bot.sendMessage(chatId,"Пожалуйста, выберите один из дней недели",
-                bot.currentKeyboard);
+                session.getCurrentKeyboard());
                 return;
             }
         }
@@ -105,25 +104,138 @@ public class AnswerProcessor {
         Tutor tutor = (Tutor) session.getUser();
         if(answer.matches("^([0-1][0-9]|2[0-3]):[0-5][0-9]-([0-1][0-9]|2[0-3]):[0-5][0-9]" + 
         "(, ?([0-1][0-9]|2[0-3]):[0-5][0-9]-([0-1][0-9]|2[0-3]):[0-5][0-9])*$"))
-        tutor.getAvailability().put(currentDayOfWeek, answer);
+        tutor.getAvailability().put(session.getCurrentDayOfWeek(), answer);
         else {
             String text = String.format("Неверный формат интервалов" + 
-            "\\n%s: Укажите один или более интервалов доступности " + 
-            "в формате \"ЧЧ:ММ-ЧЧ:ММ\", перечисляя их через запятую. ", 
-            currentDayOfWeek.getValue()) + "Пример: 10:45-14:00, 20:00-22:30";
-            bot.sendMessage(chatId, text, bot.currentKeyboard);
+            "%s: Укажите один или более интервалов доступности " + 
+            "в формате \"ЧЧ:ММ-ЧЧ:ММ\", перечисляя их через запятую. 🕰%n", 
+            session.getCurrentDayOfWeek().getValue()) + "Пример: 10:45-14:00, 20:00-22:30";
+            bot.sendMessage(chatId, text, session.getCurrentKeyboard());
             return;
         }
-        //session.setStage(Stage.ASKING_FOR_AVAILABILITY_DAY);
-        //questionHandler.askForAvailabilityDay(chatId);
-        String result = tutor.getName() + " " + tutor.getClass().getSimpleName() + " " +
-        tutor.getDateOfBirth() + " " + tutor.getLanguage() + " ";
-        for(DayOfWeek day: tutor.getAvailability().keySet())
-            result += day.getValue() + ":" + tutor.getAvailability().get(day) + " ";
-        bot.sendMessage(chatId, result, bot.currentKeyboard);
+        session.setStage(Stage.ASKING_FOR_ANOTHER_AVAILABILITY_DAY);
+        questionHandler.askForAnotherAvailabilityDay(chatId, session.getCurrentDayOfWeek(), session);
     }
 
-    void processScheduleAnswer(long chatId, String answer, UserSession session){
-        System.out.println();
+    void processAnotherAvailabilityDayAnswer(long chatId, String answer, UserSession session){
+        switch(answer) {
+            case "MONDAY" -> session.setCurrentDayOfWeek(DayOfWeek.MONDAY);
+            case "TUESDAY" -> session.setCurrentDayOfWeek(DayOfWeek.TUESDAY);
+            case "WEDNESDAY" -> session.setCurrentDayOfWeek(DayOfWeek.WEDNESDAY);
+            case "THURSDAY" -> session.setCurrentDayOfWeek(DayOfWeek.THURSDAY);
+            case "FRIDAY" -> session.setCurrentDayOfWeek(DayOfWeek.FRIDAY);
+            case "SATURDAY" -> session.setCurrentDayOfWeek(DayOfWeek.SATURDAY);
+            case "SUNDAY" -> session.setCurrentDayOfWeek(DayOfWeek.SUNDAY);
+            case "READY" -> {
+                session.setStage(Stage.ASKING_FOR_EMAIL);
+                questionHandler.askForEmail(chatId);
+                return;
+            }
+            default -> {
+                bot.sendMessage(chatId,"Пожалуйста, " + 
+                "выберите один из дней недели, либо нажмите \"Готово\"",
+                session.getCurrentKeyboard());
+                return;
+            }
+        }
+        session.setStage(Stage.ASKING_FOR_AVAILABILITY_INTERVALS);
+        questionHandler.askForAvailabilityIntervals(chatId, answer);
+    }
+
+    void processScheduleDayAnswer(long chatId, String answer, UserSession session){
+        switch(answer) {
+            case "MONDAY" -> session.setCurrentDayOfWeek(DayOfWeek.MONDAY);
+            case "TUESDAY" -> session.setCurrentDayOfWeek(DayOfWeek.TUESDAY);
+            case "WEDNESDAY" -> session.setCurrentDayOfWeek(DayOfWeek.WEDNESDAY);
+            case "THURSDAY" -> session.setCurrentDayOfWeek(DayOfWeek.THURSDAY);
+            case "FRIDAY" -> session.setCurrentDayOfWeek(DayOfWeek.FRIDAY);
+            case "SATURDAY" -> session.setCurrentDayOfWeek(DayOfWeek.SATURDAY);
+            case "SUNDAY" -> session.setCurrentDayOfWeek(DayOfWeek.SUNDAY);
+            default -> {
+                bot.sendMessage(chatId,"Пожалуйста, выберите один из дней недели",
+                session.getCurrentKeyboard());
+                return;
+            }
+        }
+        session.setStage(Stage.ASKING_FOR_SCHEDULE_TIME);
+        questionHandler.askForScheduleTime(chatId, answer);
+    }
+
+    void processScheduleTimeAnswer(long chatId, String answer, UserSession session){
+        Student student = (Student) session.getUser();
+        if(answer.matches("^([0-1][0-9]|2[0-3]):[0-5][0-9]$"))
+        student.getSchedule().put(session.getCurrentDayOfWeek(), answer);
+        else {
+            String text = "Неверный формат времени" + String.format("%s: Укажите время начала занятия " + 
+            "в формате \"ЧЧ:ММ\". 🕰", session.getCurrentDayOfWeek().getValue()) + "\nПример: 17:00";
+            bot.sendMessage(chatId, text, session.getCurrentKeyboard());
+            return;
+        }
+        session.setStage(Stage.ASKING_FOR_ANOTHER_SCHEDULE_DAY);
+        questionHandler.askForAnotherScheduleDay(chatId, session.getCurrentDayOfWeek(), session);
+    }
+
+    void processAnotherScheduleDayAnswer(long chatId, String answer, UserSession session){
+        switch(answer) {
+            case "MONDAY" -> session.setCurrentDayOfWeek(DayOfWeek.MONDAY);
+            case "TUESDAY" -> session.setCurrentDayOfWeek(DayOfWeek.TUESDAY);
+            case "WEDNESDAY" -> session.setCurrentDayOfWeek(DayOfWeek.WEDNESDAY);
+            case "THURSDAY" -> session.setCurrentDayOfWeek(DayOfWeek.THURSDAY);
+            case "FRIDAY" -> session.setCurrentDayOfWeek(DayOfWeek.FRIDAY);
+            case "SATURDAY" -> session.setCurrentDayOfWeek(DayOfWeek.SATURDAY);
+            case "SUNDAY" -> session.setCurrentDayOfWeek(DayOfWeek.SUNDAY);
+            case "READY" -> {
+                session.setStage(Stage.ASKING_FOR_TUTOR);
+                questionHandler.askForTutor(chatId, session);
+                return;
+            }
+            default -> {
+                bot.sendMessage(chatId,"Пожалуйста, " + 
+                "выберите один из дней недели, либо нажмите \"Готово\"",
+                session.getCurrentKeyboard());
+                return;
+            }
+        }
+        session.setStage(Stage.ASKING_FOR_SCHEDULE_TIME);
+        questionHandler.askForScheduleTime(chatId, answer);
+    }
+
+    void processTutorAnswer(long chatId, String answer, UserSession session){
+        Tutor tutor = null;
+        for(var suitableTutor: session.getSuitableTutors())
+            if(suitableTutor.getName().equals(answer)){
+                tutor = suitableTutor;
+                break;
+            }
+        if(tutor == null){
+            bot.sendMessage(chatId,"Пожалуйста, выберите один из предложенных вариантов",
+            session.getCurrentKeyboard());
+            return;
+        }
+        session.setStage(Stage.VIEWING_TUTOR_PAGE);
+        questionHandler.viewTutorPage(chatId, tutor);
+    }
+
+    void processTutorView(long chatId, String answer, UserSession session){
+        switch (answer) {
+            case "Записаться" -> {
+                session.setStage(Stage.ASKING_FOR_EMAIL);
+                questionHandler.askForEmail(chatId);
+            }
+            case "Вернуться к списку" -> {
+                session.setStage(Stage.ASKING_FOR_TUTOR);
+                questionHandler.askForTutor(chatId, session);
+            }
+            default -> bot.sendMessage(chatId,
+                        "Пожалуйста, выберите один из предложенных вариантов", session.getCurrentKeyboard());
+        }
+    }
+
+    void processEmailAnswer(long chatId, String answer, UserSession session){
+        
+    }
+
+    void processPhoneNumberAnswer(long chatId, String answer, UserSession session){
+        
     }
 }

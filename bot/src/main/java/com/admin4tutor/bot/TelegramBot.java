@@ -30,7 +30,6 @@ public class TelegramBot extends TelegramLongPollingBot {
     private final String botToken;
     private final String botUsername;
     private final SessionManager sessionManager;
-    public ReplyKeyboard currentKeyboard;
 
     public TelegramBot(
         @Value("${telegram.bot.token}") String botToken, 
@@ -76,11 +75,11 @@ public class TelegramBot extends TelegramLongPollingBot {
         SendMessage message = new SendMessage(String.valueOf(chatId), text);
         if(keyboardMarkup != null){
             message.setReplyMarkup(keyboardMarkup);
-            currentKeyboard = keyboardMarkup;
+            sessionManager.getUserSession(chatId).setCurrentKeyboard(keyboardMarkup);
         } else {
             ReplyKeyboardRemove remove = new ReplyKeyboardRemove(true);
             message.setReplyMarkup(remove);
-            currentKeyboard = remove;
+            sessionManager.getUserSession(chatId).setCurrentKeyboard(remove);
         }
         try{
             execute(message);
@@ -91,7 +90,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     private void startConversation(long chatId){
         ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
-        keyboardMarkup.setResizeKeyboard(true); // делает клавиатуру компактной
+        keyboardMarkup.setResizeKeyboard(true);
         keyboardMarkup.setOneTimeKeyboard(true);
         KeyboardRow row = new KeyboardRow() {{ add(new KeyboardButton("🧑🏼‍🎓 Я студент"));
         add(new KeyboardButton("🧑🏻‍🏫 Я репетитор")); }};
