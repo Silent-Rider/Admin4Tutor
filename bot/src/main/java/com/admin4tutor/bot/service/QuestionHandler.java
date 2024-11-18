@@ -162,7 +162,7 @@ public class QuestionHandler {
         List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
         tutors.forEach(x -> keyboard.add(Collections.singletonList(new InlineKeyboardButton(x.getName()))));
         keyboardMarkup.setKeyboard(keyboard);
-        String text = "Выберите подходящего репетитора из списка";
+        String text = "Выберите подходящего по вашему расписанию репетитора из списка";
         bot.sendMessage(chatId, text, keyboardMarkup);
     }
 
@@ -185,7 +185,7 @@ public class QuestionHandler {
         KeyboardRow row = (KeyboardRow)Collections.singletonList(new KeyboardButton("Пропустить"));
         List <KeyboardRow> keyboard = Collections.singletonList(row);
         keyboardMarkup.setKeyboard(keyboard);
-        bot.sendMessage(chatId, "Напишите ваш адрес электронной почты", keyboardMarkup);
+        bot.sendMessage(chatId, "Напишите ваш адрес электронной почты 📬", keyboardMarkup);
     }
 
     void askForPhoneNumber(long chatId){
@@ -195,6 +195,10 @@ public class QuestionHandler {
         KeyboardRow row = (KeyboardRow)Collections.singletonList(new KeyboardButton("Пропустить"));
         List <KeyboardRow> keyboard = Collections.singletonList(row);
         keyboardMarkup.setKeyboard(keyboard);
-        bot.sendMessage(chatId, "Напишите ваш номер телефона", keyboardMarkup);
+        bot.sendMessage(chatId, "Напишите ваш номер телефона 📞", keyboardMarkup);
+    }
+
+    void askForBiography(long chatId){
+        bot.sendMessage(chatId, "Напишите свою краткую биографию 📙", null);
     }
 }

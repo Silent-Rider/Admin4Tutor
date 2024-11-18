@@ -31,9 +31,10 @@ public class SessionManager {
             case Stage.ASKING_FOR_ANOTHER_SCHEDULE_DAY -> answerProcessor.processAnotherScheduleDayAnswer(chatId, answer, session);
             case Stage.ASKING_FOR_TUTOR -> answerProcessor.processTutorAnswer(chatId, answer, session);
             case Stage.VIEWING_TUTOR_PAGE -> answerProcessor.processTutorView(chatId, answer, session);
-            case Stage.ASKING_FOR_EMAIL -> System.out.println();
-            case Stage.ASKING_FOR_PHONE_NUMBER -> System.out.println();
-            case Stage.ASKING_FOR_BIOGRAPHY -> System.out.println();
+            case Stage.ASKING_FOR_EMAIL -> answerProcessor.processEmailAnswer(chatId, answer, session);
+            case Stage.ASKING_FOR_PHONE_NUMBER -> answerProcessor.processPhoneNumberAnswer(chatId, answer, session);
+            case Stage.ASKING_FOR_BIOGRAPHY -> answerProcessor.processBiographyAnswer(chatId, answer, session);
+            case Stage.CREATED_ACCOUNT -> System.out.println();
         }
     }
 

@@ -208,7 +208,7 @@ public class AnswerProcessor {
                 break;
             }
         if(tutor == null){
-            bot.sendMessage(chatId,"Пожалуйста, выберите один из предложенных вариантов",
+            bot.sendMessage(chatId,"Пожалуйста, выберите одного из предложенных репетиторов",
             session.getCurrentKeyboard());
             return;
         }
@@ -232,10 +232,36 @@ public class AnswerProcessor {
     }
 
     void processEmailAnswer(long chatId, String answer, UserSession session){
-        
+        if(!answer.equals("Пропустить")) session.getUser().setEmail(answer);
+        session.setStage(Stage.ASKING_FOR_PHONE_NUMBER);
+        questionHandler.askForPhoneNumber(chatId);
     }
 
     void processPhoneNumberAnswer(long chatId, String answer, UserSession session){
-        
+        if(!answer.equals("Пропустить")) session.getUser().setEmail(answer);
+        if(session.getUser() instanceof Tutor){
+            session.setStage(Stage.ASKING_FOR_BIOGRAPHY);
+            questionHandler.askForBiography(chatId);
+        } else{
+            session.setStage(Stage.CREATED_ACCOUNT);
+            printInformation(chatId, session.getUser());
+        }
+    }
+
+    void processBiographyAnswer(long chatId, String answer, UserSession session){
+        Tutor tutor = (Tutor) session.getUser();
+        if(answer.length() > 15) tutor.setBiography(answer);
+        else {
+            bot.sendMessage(chatId,"Биография слишком короткая. Напишите не менее 15 символов", 
+            session.getCurrentKeyboard());
+            return;
+        }
+        session.setStage(Stage.CREATED_ACCOUNT);
+        printInformation(chatId, session.getUser());
+
+    }
+    //Just for testing. Remove after!
+    void printInformation(long chatId, User user){
+        bot.sendMessage(chatId, user.toString(), null);
     }
 }

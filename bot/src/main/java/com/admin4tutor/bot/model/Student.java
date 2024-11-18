@@ -11,4 +11,12 @@ public class Student extends User {
         return schedule;
     }
 
+    @Override
+    public String toString(){
+        String result = "";
+        for(var day: schedule.keySet())
+            result += day.getValue() + ": " + schedule.get(day) + "\n";
+        return super.toString() + result;
+    }
+
 }
