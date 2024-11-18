@@ -107,7 +107,7 @@ public class AnswerProcessor {
         "(, ?([0-1][0-9]|2[0-3]):[0-5][0-9]-([0-1][0-9]|2[0-3]):[0-5][0-9])*$"))
         tutor.getAvailability().put(session.getCurrentDayOfWeek(), answer);
         else {
-            String text = String.format("Неверный формат интервалов" + 
+            String text = String.format("Неверный формат интервалов%n" + 
             "%s: Укажите один или более интервалов доступности " + 
             "в формате \"ЧЧ:ММ-ЧЧ:ММ\", перечисляя их через запятую 🕰%n", 
             session.getCurrentDayOfWeek().getValue()) + "Пример: 10:45-14:00, 20:00-22:30";
@@ -167,7 +167,7 @@ public class AnswerProcessor {
         if(answer.matches("^([0-1][0-9]|2[0-3]):[0-5][0-9]$"))
         student.getSchedule().put(session.getCurrentDayOfWeek(), answer);
         else {
-            String text = "Неверный формат времени" + String.format("%s: Укажите время начала занятия " + 
+            String text = "Неверный формат времени\n" + String.format("%s: Укажите время начала занятия " + 
             "в формате \"ЧЧ:ММ\" 🕰", session.getCurrentDayOfWeek().getValue()) + "\nПример: 17:00";
             bot.sendMessage(chatId, text, session.getCurrentKeyboard());
             return;

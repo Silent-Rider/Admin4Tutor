@@ -2,6 +2,7 @@ package com.admin4tutor.bot;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +43,13 @@ public class TelegramBot extends TelegramLongPollingBot {
     
     @Override
     public void onUpdateReceived(Update update) {
+        CompletableFuture.runAsync(() -> processUpdate(update)).exceptionally(e -> {
+                logger.error("Exception during async processing of update", e);
+                return null;
+            });
+    }
+
+    private void processUpdate(Update update){
         if(update.hasMessage() && update.getMessage().hasText()) {
             Message message = update.getMessage();
             long chatId = message.getChatId();
