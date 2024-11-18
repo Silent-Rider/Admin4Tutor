@@ -55,7 +55,7 @@ public class AnswerProcessor {
     }
     
     void processNameAnswer(long chatId, String answer, UserSession session){
-        if(answer.matches("[А-Яа-я]+? [А-Яа-я]+?")) session.getUser().setName(answer);
+        if(answer.matches("[А-Яа-я]+? [А-Яа-я]+?")) session.getUser().setName(answer.trim());
         else {
             bot.sendMessage(chatId, "Неверный формат имени. " +
             "Пожалуйста, введите фамилию и имя через пробел", session.getCurrentKeyboard());
@@ -204,7 +204,7 @@ public class AnswerProcessor {
     void processTutorAnswer(long chatId, String answer, UserSession session){
         Tutor tutor = null;
         for(var suitableTutor: session.getSuitableTutors())
-            if(suitableTutor.getName().equals(answer)){
+            if(suitableTutor.getName().equals(answer.trim())){
                 tutor = suitableTutor;
                 break;
             }

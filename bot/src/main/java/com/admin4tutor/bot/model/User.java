@@ -65,7 +65,8 @@ public abstract class User {
 
     @Override
     public String toString(){
-        return name + "\nВозраст: " + getAge() + "\nЯзык: " + language.getValue() + "\nПочта: " + 
-        (email == null ? "" : email) + "\nНомер телефона: " + (phoneNumber == null ? "" : phoneNumber);
+        return name + "\nВозраст: " + getAge() + "\nЯзык: " + language.getValue() + 
+        (email == null ? "" : "\nПочта: " + email) + 
+        (phoneNumber == null ? "" : "\nНомер телефона: " + phoneNumber);
     }
 }

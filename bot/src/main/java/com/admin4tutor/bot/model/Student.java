@@ -13,10 +13,10 @@ public class Student extends User {
 
     @Override
     public String toString(){
-        String result = "";
+        String result = "Расписание учебных занятий\n";
         for(var day: schedule.keySet())
             result += day.getValue() + ": " + schedule.get(day) + "\n";
-        return super.toString() + result;
+        return super.toString() + "\n" + result;
     }
 
 }

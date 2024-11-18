@@ -41,7 +41,7 @@ public class QuestionHandler {
     }
 
     void askForName(long chatId){
-        bot.sendMessage(chatId, "Введите вашу фамилию и имя через пробел", null);
+        bot.sendMessage(chatId, "Введите вашу фамилию и имя", null);
     }
 
     void askForDateOfBirth(long chatId){
@@ -167,7 +167,11 @@ public class QuestionHandler {
         InlineKeyboardMarkup keyboardMarkup = new InlineKeyboardMarkup();
         List<Tutor> tutors = session.getSuitableTutors();
         List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
-        tutors.forEach(x -> keyboard.add(Collections.singletonList(new InlineKeyboardButton(x.getName()))));
+        tutors.forEach(x -> {
+            InlineKeyboardButton button = new InlineKeyboardButton(x.getName());
+            button.setCallbackData(x.getName());
+            keyboard.add(Collections.singletonList(button));
+        });
         keyboardMarkup.setKeyboard(keyboard);
         String text = "Выберите подходящего по вашему расписанию репетитора из списка";
         bot.sendMessage(chatId, text, keyboardMarkup);
