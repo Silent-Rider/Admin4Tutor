@@ -1,6 +1,6 @@
 package com.admin4tutor.bot.service;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -14,7 +14,7 @@ public class UserSession {
     
     private Stage stage;
     private User user;
-    private List<DayOfWeek> currentDays;
+    private List<DayOfWeek> currentDays = new ArrayList<>();
     private ReplyKeyboard currentKeyboard;
     private List<Tutor> suitableTutors;
     private DayOfWeek currentDayOfWeek;
@@ -22,7 +22,8 @@ public class UserSession {
     UserSession(Stage stage, User user){
         this.stage = stage;
         this.user = user;
-        currentDays = Arrays.asList(DayOfWeek.values());
+        for(var day: DayOfWeek.values())
+            currentDays.add(day);
     }
 
     public Stage getStage() {

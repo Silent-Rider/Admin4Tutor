@@ -93,7 +93,11 @@ public class QuestionHandler {
             keyboard.get(j).add(button);
             if((i+1) % 2 == 0) j++;
         }
-        if(daysOfWeek.isEmpty()) session.setCurrentDays(Arrays.asList(DayOfWeek.values()));
+        if(daysOfWeek.isEmpty()){
+            session.setCurrentDays(new ArrayList<DayOfWeek>());
+            for(var day: DayOfWeek.values())
+                session.getCurrentDays().add(day);
+        }
         InlineKeyboardButton ready = new InlineKeyboardButton("Готово");
         ready.setCallbackData("READY");
         keyboard.add(Collections.singletonList(ready));
@@ -146,7 +150,11 @@ public class QuestionHandler {
             keyboard.get(j).add(button);
             if((i+1) % 2 == 0) j++;
         }
-        if(daysOfWeek.isEmpty()) session.setCurrentDays(Arrays.asList(DayOfWeek.values()));
+        if(daysOfWeek.isEmpty()){
+            session.setCurrentDays(new ArrayList<DayOfWeek>());
+            for(var day: DayOfWeek.values())
+                session.getCurrentDays().add(day);
+        }
         InlineKeyboardButton ready = new InlineKeyboardButton("Готово");
         ready.setCallbackData("READY");
         keyboard.add(Collections.singletonList(ready));
@@ -182,7 +190,8 @@ public class QuestionHandler {
         ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
         keyboardMarkup.setResizeKeyboard(true);
         keyboardMarkup.setOneTimeKeyboard(true);
-        KeyboardRow row = (KeyboardRow)Collections.singletonList(new KeyboardButton("Пропустить"));
+        KeyboardButton skip = new KeyboardButton("Пропустить");
+        KeyboardRow row = new KeyboardRow(){{add(skip);}};
         List <KeyboardRow> keyboard = Collections.singletonList(row);
         keyboardMarkup.setKeyboard(keyboard);
         bot.sendMessage(chatId, "Напишите ваш адрес электронной почты 📬", keyboardMarkup);
@@ -192,7 +201,8 @@ public class QuestionHandler {
         ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
         keyboardMarkup.setResizeKeyboard(true);
         keyboardMarkup.setOneTimeKeyboard(true);
-        KeyboardRow row = (KeyboardRow)Collections.singletonList(new KeyboardButton("Пропустить"));
+        KeyboardButton skip = new KeyboardButton("Пропустить");
+        KeyboardRow row = new KeyboardRow(){{add(skip);}};
         List <KeyboardRow> keyboard = Collections.singletonList(row);
         keyboardMarkup.setKeyboard(keyboard);
         bot.sendMessage(chatId, "Напишите ваш номер телефона 📞", keyboardMarkup);

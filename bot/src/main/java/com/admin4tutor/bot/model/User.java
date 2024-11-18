@@ -58,7 +58,8 @@ public abstract class User {
     }
 
     public int getAge(){
-        LocalDate date = (LocalDate)DateTimeFormatter.ofPattern("dd.MM.yyyy").parse(dateOfBirth);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+        LocalDate date = LocalDate.parse(dateOfBirth, formatter);
         return Period.between(date, LocalDate.now()).getYears();
     }
 
