@@ -8,6 +8,8 @@ services:
       POSTGRES_DB: tutor_manager_db
     ports:
       - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
     networks:
       - admin4tutor-network
 
@@ -16,6 +18,7 @@ services:
       context: ./server
     container_name: admin4tutor-server
     environment:
+      SPRING_PROFILES_ACTIVE: docker
       SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/tutor_manager_db
       SPRING_DATASOURCE_USERNAME: silent_rider
       SPRING_DATASOURCE_PASSWORD: password
@@ -37,3 +40,6 @@ services:
 
 networks:
   admin4tutor-network:
+
+volumes:
+  db_data:

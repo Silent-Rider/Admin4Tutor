@@ -1,5 +1,6 @@
 package com.admin4tutor.server.model.entities;
 
+import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -26,6 +27,9 @@ public class Tutor {
 
     @Column(nullable = false)
     private String name;
+
+    @Column(name = "date_of_birth", nullable = false)
+    private Date dateOfBirth;
 
     @ElementCollection
     @Enumerated(EnumType.STRING)

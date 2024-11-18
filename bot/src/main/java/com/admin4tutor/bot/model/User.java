@@ -9,6 +9,7 @@ public abstract class User {
     private String language;
     private String email;
     private String phoneNumber;
+    private String dateOfBirth;
     
     public Long getId() {
         return id;
@@ -51,5 +52,11 @@ public abstract class User {
     }
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
+    }
+    public String getDateOfBirth() {
+        return dateOfBirth;
+    }
+    public void setDateOfBirth(String dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
     }
 }

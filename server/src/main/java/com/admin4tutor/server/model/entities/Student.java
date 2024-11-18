@@ -1,5 +1,6 @@
 package com.admin4tutor.server.model.entities;
 
+import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -8,7 +9,19 @@ import java.util.Set;
 
 import com.admin4tutor.server.model.Language;
 
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "students")
@@ -26,6 +39,9 @@ public class Student {
 
     @Column(nullable = false)
     private String name;
+
+    @Column(name = "date_of_birth", nullable = false)
+    private Date dateOfBirth;
 
     @ElementCollection
     @Enumerated(EnumType.STRING)

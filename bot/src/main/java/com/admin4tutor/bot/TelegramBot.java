@@ -26,7 +26,7 @@ import com.admin4tutor.bot.service.SessionManager;
 @Component
 public class TelegramBot extends TelegramLongPollingBot {
 
-    private static final Logger logger = LoggerFactory.getLogger(TelegramBot.class);
+    public static final Logger logger = LoggerFactory.getLogger(TelegramBot.class);
     private final String botToken;
     private final String botUsername;
     private final SessionManager sessionManager;
@@ -77,8 +77,11 @@ public class TelegramBot extends TelegramLongPollingBot {
         if(keyboardMarkup != null){
             message.setReplyMarkup(keyboardMarkup);
             currentKeyboard = keyboardMarkup;
+        } else {
+            ReplyKeyboardRemove remove = new ReplyKeyboardRemove(true);
+            message.setReplyMarkup(remove);
+            currentKeyboard = remove;
         }
-        else message.setReplyMarkup(new ReplyKeyboardRemove(true));
         try{
             execute(message);
         } catch(TelegramApiException e){
@@ -90,8 +93,8 @@ public class TelegramBot extends TelegramLongPollingBot {
         ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
         keyboardMarkup.setResizeKeyboard(true); // делает клавиатуру компактной
         keyboardMarkup.setOneTimeKeyboard(true);
-        KeyboardRow row = new KeyboardRow() {{ add(new KeyboardButton("Я студент"));
-        add(new KeyboardButton("Я репетитор")); }};
+        KeyboardRow row = new KeyboardRow() {{ add(new KeyboardButton("🧑🏼‍🎓 Я студент"));
+        add(new KeyboardButton("🧑🏻‍🏫 Я репетитор")); }};
         List <KeyboardRow> keyboard = Collections.singletonList(row);
         keyboardMarkup.setKeyboard(keyboard);
         sendMessage(chatId, "Кто вы?", keyboardMarkup);
