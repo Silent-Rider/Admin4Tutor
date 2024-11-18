@@ -1,7 +1,6 @@
 package com.admin4tutor.bot.service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -42,7 +41,7 @@ public class QuestionHandler {
     }
 
     void askForName(long chatId){
-        bot.sendMessage(chatId, "Введите через пробел вашу фамилию и имя", null);
+        bot.sendMessage(chatId, "Введите вашу фамилию и имя через пробел", null);
     }
 
     void askForDateOfBirth(long chatId){
@@ -194,7 +193,7 @@ public class QuestionHandler {
         KeyboardRow row = new KeyboardRow(){{add(skip);}};
         List <KeyboardRow> keyboard = Collections.singletonList(row);
         keyboardMarkup.setKeyboard(keyboard);
-        bot.sendMessage(chatId, "Напишите ваш адрес электронной почты 📬", keyboardMarkup);
+        bot.sendMessage(chatId, "Напишите ваш адрес электронной почты ✉️", keyboardMarkup);
     }
 
     void askForPhoneNumber(long chatId){

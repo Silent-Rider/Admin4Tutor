@@ -7,6 +7,7 @@ import java.util.List;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 
 import com.admin4tutor.bot.model.DayOfWeek;
+import com.admin4tutor.bot.model.Language;
 import com.admin4tutor.bot.model.Tutor;
 import com.admin4tutor.bot.model.User;
 
@@ -71,8 +72,8 @@ public class UserSession {
         Tutor tutor = new Tutor();
         tutor.setName("Клименко Кирилл");
         tutor.setDateOfBirth("30.10.2001");
-        tutor.setLanguage("ENGLISH");
-        tutor.setLanguage("silent.30.rider.10@gmail.com");
+        tutor.setLanguage(Language.ENGLISH);
+        tutor.setEmail("silent.30.rider.10@gmail.com");
         tutor.setPhoneNumber("+79529170764");
         tutor.setBiography("Cool guy");
         return Collections.singletonList(tutor);

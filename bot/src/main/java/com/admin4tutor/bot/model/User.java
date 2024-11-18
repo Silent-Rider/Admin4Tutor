@@ -9,7 +9,7 @@ public abstract class User {
     private Long chatId;
     private Long telegramId;
     private String name;
-    private String language;
+    private Language language;
     private String email;
     private String phoneNumber;
     private String dateOfBirth;
@@ -32,10 +32,10 @@ public abstract class User {
     public void setName(String name) {
         this.name = name;
     }
-    public String getLanguage() {
+    public Language getLanguage() {
         return language;
     }
-    public void setLanguage(String language) {
+    public void setLanguage(Language language) {
         this.language = language;
     }
     public String getEmail() {
@@ -65,7 +65,7 @@ public abstract class User {
 
     @Override
     public String toString(){
-        return name + "\nВозраст: " + getAge() + "\nЯзык: " + language + email == null ? "" : email +
-        phoneNumber == null ? "" : phoneNumber;
+        return name + "\nВозраст: " + getAge() + "\nЯзык: " + language.getValue() + "\nПочта: " + 
+        (email == null ? "" : email) + "\nНомер телефона: " + (phoneNumber == null ? "" : phoneNumber);
     }
 }

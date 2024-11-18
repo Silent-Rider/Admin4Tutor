@@ -2,6 +2,7 @@ package com.admin4tutor.bot.service;
 
 import com.admin4tutor.bot.TelegramBot;
 import com.admin4tutor.bot.model.DayOfWeek;
+import com.admin4tutor.bot.model.Language;
 import com.admin4tutor.bot.model.Student;
 import com.admin4tutor.bot.model.Tutor;
 import com.admin4tutor.bot.model.User;
@@ -35,14 +36,14 @@ public class AnswerProcessor {
 
     void processLanguageAnswer(long chatId, String answer, UserSession session){
         switch(answer) {
-            case "ENGLISH" -> session.getUser().setLanguage(answer);
-            case "GERMAN" -> session.getUser().setLanguage(answer);
-            case "FRENCH" -> session.getUser().setLanguage(answer);
-            case "SPANISH" -> session.getUser().setLanguage(answer);
-            case "ITALIAN" -> session.getUser().setLanguage(answer);
-            case "CHINESE" -> session.getUser().setLanguage(answer);
-            case "JAPANESE" -> session.getUser().setLanguage(answer);
-            case "KOREAN" -> session.getUser().setLanguage(answer);
+            case "ENGLISH" -> session.getUser().setLanguage(Language.ENGLISH);
+            case "GERMAN" -> session.getUser().setLanguage(Language.GERMAN);
+            case "FRENCH" -> session.getUser().setLanguage(Language.FRENCH);
+            case "SPANISH" -> session.getUser().setLanguage(Language.SPANISH);
+            case "ITALIAN" -> session.getUser().setLanguage(Language.ITALIAN);
+            case "CHINESE" -> session.getUser().setLanguage(Language.CHINESE);
+            case "JAPANESE" -> session.getUser().setLanguage(Language.JAPANESE);
+            case "KOREAN" -> session.getUser().setLanguage(Language.KOREAN);
             default -> {
                 bot.sendMessage(chatId,"Пожалуйста, выберите один из предложенных вариантов",
                 session.getCurrentKeyboard());
@@ -238,7 +239,7 @@ public class AnswerProcessor {
     }
 
     void processPhoneNumberAnswer(long chatId, String answer, UserSession session){
-        if(!answer.equals("Пропустить")) session.getUser().setEmail(answer);
+        if(!answer.equals("Пропустить")) session.getUser().setPhoneNumber(answer);
         if(session.getUser() instanceof Tutor){
             session.setStage(Stage.ASKING_FOR_BIOGRAPHY);
             questionHandler.askForBiography(chatId);
