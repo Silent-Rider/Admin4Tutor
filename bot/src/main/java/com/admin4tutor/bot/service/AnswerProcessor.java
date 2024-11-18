@@ -109,7 +109,7 @@ public class AnswerProcessor {
         else {
             String text = String.format("Неверный формат интервалов" + 
             "%s: Укажите один или более интервалов доступности " + 
-            "в формате \"ЧЧ:ММ-ЧЧ:ММ\", перечисляя их через запятую. 🕰%n", 
+            "в формате \"ЧЧ:ММ-ЧЧ:ММ\", перечисляя их через запятую 🕰%n", 
             session.getCurrentDayOfWeek().getValue()) + "Пример: 10:45-14:00, 20:00-22:30";
             bot.sendMessage(chatId, text, session.getCurrentKeyboard());
             return;
@@ -168,7 +168,7 @@ public class AnswerProcessor {
         student.getSchedule().put(session.getCurrentDayOfWeek(), answer);
         else {
             String text = "Неверный формат времени" + String.format("%s: Укажите время начала занятия " + 
-            "в формате \"ЧЧ:ММ\". 🕰", session.getCurrentDayOfWeek().getValue()) + "\nПример: 17:00";
+            "в формате \"ЧЧ:ММ\" 🕰", session.getCurrentDayOfWeek().getValue()) + "\nПример: 17:00";
             bot.sendMessage(chatId, text, session.getCurrentKeyboard());
             return;
         }
