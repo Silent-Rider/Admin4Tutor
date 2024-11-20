@@ -62,7 +62,7 @@ public abstract class User {
         this.dateOfBirth = dateOfBirth;
     }
 
-    public String getAge(){
+    private String getAge(){
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
         LocalDate date = LocalDate.parse(dateOfBirth, formatter);
         String age = String.valueOf(Period.between(date, LocalDate.now()).getYears());

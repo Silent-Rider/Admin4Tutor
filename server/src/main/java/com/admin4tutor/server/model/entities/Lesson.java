@@ -40,6 +40,55 @@ public class Lesson {
     @Column(columnDefinition = "VARCHAR(9)", nullable = false)
     private Status status = Status.SCHEDULED;
 
+    public Long getId() {
+        return id;
+    }
+    public void setId(Long id) {
+        this.id = id;
+    }
+    public Student getStudent() {
+        return student;
+    }
+    public void setStudent(Student student) {
+        this.student = student;
+    }
+    public Tutor getTutor() {
+        return tutor;
+    }
+    public void setTutor(Tutor tutor) {
+        this.tutor = tutor;
+    }
+    public Language getLanguage() {
+        return language;
+    }
+    public void setLanguage(Language language) {
+        this.language = language;
+    }
+    public Date getLessonDate() {
+        return lessonDate;
+    }
+    public void setLessonDate(Date lessonDate) {
+        this.lessonDate = lessonDate;
+    }
+    public Time getStartTime() {
+        return startTime;
+    }
+    public void setStartTime(Time startTime) {
+        this.startTime = startTime;
+    }
+    public Time getEndTime() {
+        return endTime;
+    }
+    public void setEndTime(Time endTime) {
+        this.endTime = endTime;
+    }
+    public Status getStatus() {
+        return status;
+    }
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+    
     private enum Status{
         SCHEDULED, 
         COMPLETED, 

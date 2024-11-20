@@ -1,11 +1,11 @@
 package com.admin4tutor.bot.dto;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Student extends User {
     
-    private final Map<DayOfWeek, String> schedule = new HashMap<>(2);
+    private final Map<DayOfWeek, String> schedule = new ConcurrentHashMap<>();
     private Long tutorId;
 
     public Student(long chatId, long telegramId) {

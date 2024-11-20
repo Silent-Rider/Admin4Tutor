@@ -203,7 +203,8 @@ public class QuestionHandler {
                 var availability = tutor.getAvailability();
                 String result = user.toString() + "\n🆓 Доступность 🆓";
                 for(var day: availability.keySet())
-                    result += "\n" + day.getValue() + ": " + availability.get(day);
+                    result += "\n" + day.getValue() + ": " + (availability.get(day) == null ? "занят"
+                     : availability.get(day));
                 bot.sendMessage(chatId, result, keyboardMarkup);
             }
             case Student student -> bot.sendMessage(chatId, student.toString(), keyboardMarkup);

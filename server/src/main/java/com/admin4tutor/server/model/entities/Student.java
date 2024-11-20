@@ -52,4 +52,71 @@ public class Student {
     @ManyToOne
     @JoinColumn(name = "tutor_id", nullable = false)
     private Tutor tutor;
+
+    public Long getId() {
+        return id;
+    }
+    public void setId(Long id) {
+        this.id = id;
+    }
+    public Long getTelegramId() {
+        return telegramId;
+    }
+    public void setTelegramId(Long telegramId) {
+        this.telegramId = telegramId;
+    }
+    public Long getChatId() {
+        return chatId;
+    }
+    public void setChatId(Long chatId) {
+        this.chatId = chatId;
+    }
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+    public Date getDateOfBirth() {
+        return dateOfBirth;
+    }
+    public void setDateOfBirth(Date dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
+    public Set<Language> getLanguages() {
+        return languages;
+    }
+    public void setLanguages(Set<Language> languages) {
+        this.languages = languages;
+    }
+    public String getEmail() {
+        return email;
+    }
+    public void setEmail(String email) {
+        this.email = email;
+    }
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
+    }
+    public List<Lesson> getLessons() {
+        return lessons;
+    }
+    public void setLessons(List<Lesson> lessons) {
+        this.lessons = lessons;
+    }
+    public Tutor getTutor() {
+        return tutor;
+    }
+    public void setTutor(Tutor tutor) {
+        this.tutor = tutor;
+    }
 }
