@@ -8,13 +8,13 @@ public class Tutor extends User {
     private String biography;
     private Integer price;
     private final Map<DayOfWeek, String> availability = new ConcurrentHashMap<>(7){{
-        put(DayOfWeek.MONDAY, "busy");
-        put(DayOfWeek.TUESDAY, "busy");
-        put(DayOfWeek.WEDNESDAY, "busy");
-        put(DayOfWeek.THURSDAY, "busy");
-        put(DayOfWeek.FRIDAY, "busy");
-        put(DayOfWeek.SATURDAY, "busy");
-        put(DayOfWeek.SUNDAY, "busy");
+        put(DayOfWeek.MONDAY, "занят");
+        put(DayOfWeek.TUESDAY, "занят");
+        put(DayOfWeek.WEDNESDAY, "занят");
+        put(DayOfWeek.THURSDAY, "занят");
+        put(DayOfWeek.FRIDAY, "занят");
+        put(DayOfWeek.SATURDAY, "занят");
+        put(DayOfWeek.SUNDAY, "занят");
     }};
 
     public Tutor(long chatId, long telegramId) {

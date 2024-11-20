@@ -78,7 +78,7 @@ public class AnswerProcessor {
             questionHandler.askForAvailabilityDay(chatId);
         } else {
             session.setStage(Stage.ASKING_FOR_SCHEDULE_DAY);
-            questionHandler.askForScheduleDay(chatId, session.getUser());
+            questionHandler.askForScheduleDay(chatId);
         }
     }
     
@@ -199,8 +199,8 @@ public class AnswerProcessor {
             case "SATURDAY" -> session.setCurrentDayOfWeek(DayOfWeek.SATURDAY);
             case "SUNDAY" -> session.setCurrentDayOfWeek(DayOfWeek.SUNDAY);
             case "READY" -> {
-                session.setStage(Stage.ASKING_FOR_TUTOR);
-                questionHandler.askForTutor(chatId, session);
+                session.setStage(Stage.ASKING_FOR_EMAIL);
+                questionHandler.askForEmail(chatId);
                 return;
             }
             default -> {
@@ -214,8 +214,63 @@ public class AnswerProcessor {
         questionHandler.askForScheduleTime(chatId, answer);
     }
 
+    void processEmailAnswer(long chatId, String answer, UserSession session){
+        if(!answer.equals("Пропустить")) session.getUser().setEmail(answer);
+        session.setStage(Stage.ASKING_FOR_PHONE_NUMBER);
+        questionHandler.askForPhoneNumber(chatId);
+    }
+
+    void processPhoneNumberAnswer(long chatId, String answer, UserSession session){
+        User user = session.getUser();
+        if(!answer.equals("Пропустить")) user.setPhoneNumber(answer);
+        if(user instanceof Tutor){
+            session.setStage(Stage.ASKING_FOR_BIOGRAPHY);
+            questionHandler.askForBiography(chatId);
+        } else{
+            session.setStage(Stage.CHECKING_QUESTIONNAIRE_RESULTS);
+            questionHandler.askForCheckingQuestionnaireResults(chatId, user);
+        }
+    }
+
+    void processBiographyAnswer(long chatId, String answer, UserSession session){
+        Tutor tutor = (Tutor) session.getUser();
+        if(answer.length() > 14) tutor.setBiography(answer);
+        else {
+            bot.sendMessage(chatId,"Биография слишком короткая. Напишите не менее 15 символов", 
+            session.getCurrentKeyboard());
+            return;
+        }
+        session.setStage(Stage.CHECKING_QUESTIONNAIRE_RESULTS);
+        questionHandler.askForCheckingQuestionnaireResults(chatId, tutor);
+    }
+    
+    void processChekingQuestionnaireAnswer(long chatId, String answer, UserSession session){
+        User user = session.getUser();
+        if(answer.equals("Заполнить анкету заново")){
+            session.setStage(Stage.ASKING_FOR_LANGUAGE);
+            questionHandler.askForLanguage(chatId, user);
+        } else if(answer.equals("Готово")){
+            if(user instanceof Tutor){
+                session.setStage(Stage.SENDING_USER_TO_SERVER);
+                session.sendUser();
+            } else{
+                session.setStage(Stage.ASKING_FOR_TUTOR);
+                questionHandler.askForTutor(chatId, session);
+            }
+        }
+    }
+
     void processTutorAnswer(long chatId, String answer, UserSession session){
         Tutor tutor = null;
+        if(answer.equals("Изменить расписание")){
+            session.setStage(Stage.ASKING_FOR_SCHEDULE_DAY);
+            questionHandler.askForScheduleDay(chatId);
+            return;
+        } else if(answer.equals("Вернуться в начало")){
+            session.setStage(Stage.ASKING_FOR_ROLE);
+            bot.startConversation(chatId);
+            return;
+        }
         for(var suitableTutor: session.getSuitableTutors())
             if(suitableTutor.getName().equals(answer.trim())){
                 tutor = suitableTutor;
@@ -236,8 +291,8 @@ public class AnswerProcessor {
         switch (answer) {
             case "Записаться" -> {
                 student.setTutorId(session.getCurrentTutor().getTelegramId());
-                session.setStage(Stage.ASKING_FOR_EMAIL);
-                questionHandler.askForEmail(chatId);
+                session.setStage(Stage.SENDING_USER_TO_SERVER);
+                session.sendUser();
             }
             case "Вернуться к списку" -> {
                 session.setStage(Stage.ASKING_FOR_TUTOR);
@@ -246,38 +301,5 @@ public class AnswerProcessor {
             default -> bot.sendMessage(chatId,
                         "Пожалуйста, выберите один из предложенных вариантов", session.getCurrentKeyboard());
         }
-    }
-
-    void processEmailAnswer(long chatId, String answer, UserSession session){
-        if(!answer.equals("Пропустить")) session.getUser().setEmail(answer);
-        session.setStage(Stage.ASKING_FOR_PHONE_NUMBER);
-        questionHandler.askForPhoneNumber(chatId);
-    }
-
-    void processPhoneNumberAnswer(long chatId, String answer, UserSession session){
-        if(!answer.equals("Пропустить")) session.getUser().setPhoneNumber(answer);
-        if(session.getUser() instanceof Tutor){
-            session.setStage(Stage.ASKING_FOR_BIOGRAPHY);
-            questionHandler.askForBiography(chatId);
-        } else{
-            session.setStage(Stage.CREATED_ACCOUNT);
-            printInformation(chatId, session.getUser());
-        }
-    }
-
-    void processBiographyAnswer(long chatId, String answer, UserSession session){
-        Tutor tutor = (Tutor) session.getUser();
-        if(answer.length() > 14) tutor.setBiography(answer);
-        else {
-            bot.sendMessage(chatId,"Биография слишком короткая. Напишите не менее 15 символов", 
-            session.getCurrentKeyboard());
-            return;
-        }
-        session.setStage(Stage.CREATED_ACCOUNT);
-        printInformation(chatId, session.getUser());
-    }
-    //Just for testing. Remove after!
-    void printInformation(long chatId, User user){
-        bot.sendMessage(chatId, user.toString(), null);
     }
 }

@@ -1,6 +1,7 @@
 package com.admin4tutor.bot.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -13,6 +14,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import com.admin4tutor.bot.TelegramBot;
 import com.admin4tutor.bot.dto.DayOfWeek;
 import com.admin4tutor.bot.dto.Language;
+import com.admin4tutor.bot.dto.Student;
 import com.admin4tutor.bot.dto.Tutor;
 import com.admin4tutor.bot.dto.User;
 
@@ -92,11 +94,8 @@ public class QuestionHandler {
             keyboard.get(j).add(button);
             if((i+1) % 2 == 0) j++;
         }
-        if(daysOfWeek.isEmpty()){
-            session.setCurrentDays(new ArrayList<DayOfWeek>());
-            for(var day: DayOfWeek.values())
-                session.getCurrentDays().add(day);
-        }
+        if(daysOfWeek.isEmpty())
+            session.setCurrentDays(new ArrayList<>(Arrays.asList(DayOfWeek.values())));
         InlineKeyboardButton ready = new InlineKeyboardButton("Готово");
         ready.setCallbackData("READY");
         keyboard.add(Collections.singletonList(ready));
@@ -110,7 +109,7 @@ public class QuestionHandler {
         bot.sendMessage(chatId, "Укажите желаемую цену за занятие в рублях 💰", null);
     }
 
-    void askForScheduleDay(long chatId, User user){
+    void askForScheduleDay(long chatId){
         InlineKeyboardMarkup keyboardMarkup = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
         for(int i = 0; i < 4; i++) keyboard.add(new ArrayList<>());
@@ -153,11 +152,8 @@ public class QuestionHandler {
             keyboard.get(j).add(button);
             if((i+1) % 2 == 0) j++;
         }
-        if(daysOfWeek.isEmpty()){
-            session.setCurrentDays(new ArrayList<DayOfWeek>());
-            for(var day: DayOfWeek.values())
-                session.getCurrentDays().add(day);
-        }
+        if(daysOfWeek.isEmpty())
+            session.setCurrentDays(new ArrayList<>(Arrays.asList(DayOfWeek.values())));
         InlineKeyboardButton ready = new InlineKeyboardButton("Готово");
         ready.setCallbackData("READY");
         keyboard.add(Collections.singletonList(ready));
@@ -165,32 +161,6 @@ public class QuestionHandler {
         String text = "Выберите еще один день недели для проведения занятий," +
         " либо нажмите \"Готово\"";
         bot.sendMessage(chatId, text, keyboardMarkup);
-    }
-    
-    void askForTutor(long chatId, UserSession session){
-        InlineKeyboardMarkup keyboardMarkup = new InlineKeyboardMarkup();
-        List<Tutor> tutors = session.getSuitableTutors();
-        List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
-        tutors.forEach(x -> {
-            InlineKeyboardButton button = new InlineKeyboardButton(x.getName());
-            button.setCallbackData(x.getName());
-            keyboard.add(Collections.singletonList(button));
-        });
-        keyboardMarkup.setKeyboard(keyboard);
-        String text = "Выберите подходящего по вашему расписанию репетитора из списка";
-        bot.sendMessage(chatId, text, keyboardMarkup);
-    }
-
-    void viewTutorPage(long chatId, Tutor tutor){
-        ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
-        keyboardMarkup.setResizeKeyboard(true);
-        keyboardMarkup.setOneTimeKeyboard(true);
-        KeyboardButton register = new KeyboardButton("Записаться");
-        KeyboardButton backToList = new KeyboardButton("Вернуться к списку");
-        KeyboardRow row = new KeyboardRow(){{add(register); add(backToList);}};
-        List <KeyboardRow> keyboard = Collections.singletonList(row);
-        keyboardMarkup.setKeyboard(keyboard);
-        bot.sendMessage(chatId, tutor.toString(), keyboardMarkup);
     }
 
     void askForEmail(long chatId){
@@ -217,5 +187,64 @@ public class QuestionHandler {
 
     void askForBiography(long chatId){
         bot.sendMessage(chatId, "Напишите свою краткую биографию 📙", null);
+    }
+
+    void askForCheckingQuestionnaireResults(long chatId, User user){
+        ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+        keyboardMarkup.setResizeKeyboard(true);
+        keyboardMarkup.setOneTimeKeyboard(true);
+        KeyboardButton ready = new KeyboardButton("Готово");
+        KeyboardButton refill = new KeyboardButton("Заполнить анкету заново");
+        KeyboardRow row = new KeyboardRow(){{ add(ready); add(refill); }};
+        List <KeyboardRow> keyboard = Collections.singletonList(row);
+        keyboardMarkup.setKeyboard(keyboard);
+        switch (user) {
+            case Tutor tutor -> {
+                var availability = tutor.getAvailability();
+                String result = user.toString() + "\n🆓 Доступность 🆓";
+                for(var day: availability.keySet())
+                    result += "\n" + day.getValue() + ": " + availability.get(day);
+                bot.sendMessage(chatId, result, keyboardMarkup);
+            }
+            case Student student -> bot.sendMessage(chatId, student.toString(), keyboardMarkup);
+            default -> {
+                TelegramBot.logger.error("Lost type of user");
+            }
+        }
+    }
+
+    void askForTutor(long chatId, UserSession session){
+        InlineKeyboardMarkup keyboardMarkup = new InlineKeyboardMarkup();
+        List<Tutor> tutors = session.getSuitableTutors();
+        if(tutors.isEmpty()){
+            ReplyKeyboardMarkup simpleKeyboardMarkup = new ReplyKeyboardMarkup();
+            KeyboardRow row1 = new KeyboardRow(){{ add(new KeyboardButton("Изменить расписание")); }};
+            KeyboardRow row2 = new KeyboardRow(){{ add(new KeyboardButton("Вернуться в начало")); }};
+            simpleKeyboardMarkup.setKeyboard(Arrays.asList(row1, row2));
+            bot.sendMessage(chatId,"К сожалению, " +
+            "подходящих по вашему расписанию репетиторов нет", simpleKeyboardMarkup);
+            return;
+        }
+        List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
+        tutors.forEach(x -> {
+            InlineKeyboardButton button = new InlineKeyboardButton(x.getName());
+            button.setCallbackData(x.getName());
+            keyboard.add(Collections.singletonList(button));
+        });
+        keyboardMarkup.setKeyboard(keyboard);
+        String text = "Выберите подходящего по вашему расписанию репетитора из списка";
+        bot.sendMessage(chatId, text, keyboardMarkup);
+    }
+
+    void viewTutorPage(long chatId, Tutor tutor){
+        ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+        keyboardMarkup.setResizeKeyboard(true);
+        keyboardMarkup.setOneTimeKeyboard(true);
+        KeyboardButton register = new KeyboardButton("Записаться");
+        KeyboardButton backToList = new KeyboardButton("Вернуться к списку");
+        KeyboardRow row = new KeyboardRow(){{add(register); add(backToList);}};
+        List <KeyboardRow> keyboard = Collections.singletonList(row);
+        keyboardMarkup.setKeyboard(keyboard);
+        bot.sendMessage(chatId, tutor.toString(), keyboardMarkup);
     }
 }

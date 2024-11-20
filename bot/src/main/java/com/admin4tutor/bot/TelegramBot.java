@@ -21,6 +21,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import com.admin4tutor.bot.client.WebClientService;
 import com.admin4tutor.bot.service.AnswerProcessor;
 import com.admin4tutor.bot.service.SessionManager;
 
@@ -31,14 +32,16 @@ public class TelegramBot extends TelegramLongPollingBot {
     private final String botToken;
     private final String botUsername;
     private final SessionManager sessionManager;
+    private final WebClientService webClientService;
 
-    public TelegramBot(
-        @Value("${telegram.bot.token}") String botToken, 
-        @Value("${telegram.bot.username}")String botUsername) {
+    public TelegramBot (@Value("${telegram.bot.token}") String botToken,
+    @Value("${telegram.bot.username}")String botUsername,
+    WebClientService webClientService) {
         super(new DefaultBotOptions(), botToken);
         this.botToken = botToken;
         this.botUsername = botUsername;
-        this.sessionManager = new SessionManager(new AnswerProcessor(this));
+        this.webClientService = webClientService;
+        this.sessionManager = new SessionManager(new AnswerProcessor(this), this.webClientService);
     }
     
     @Override
@@ -47,6 +50,16 @@ public class TelegramBot extends TelegramLongPollingBot {
                 logger.error("Exception during async processing of update", e);
                 return null;
             });
+    }
+
+    @Override
+    public String getBotToken() {
+        return botToken;
+    }
+
+    @Override
+    public String getBotUsername() {
+        return botUsername;
     }
 
     private void processUpdate(Update update){
@@ -69,16 +82,6 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
     }
 
-    @Override
-    public String getBotToken() {
-        return botToken;
-    }
-
-    @Override
-    public String getBotUsername() {
-        return botUsername;
-    }
-
     public void sendMessage(long chatId, String text, ReplyKeyboard keyboardMarkup){
         SendMessage message = new SendMessage(String.valueOf(chatId), text);
         if(keyboardMarkup != null){
@@ -96,7 +99,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
     }
 
-    private void startConversation(long chatId){
+    public void startConversation(long chatId){
         ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
         keyboardMarkup.setResizeKeyboard(true);
         keyboardMarkup.setOneTimeKeyboard(true);

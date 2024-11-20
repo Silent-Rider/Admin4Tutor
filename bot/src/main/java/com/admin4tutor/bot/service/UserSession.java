@@ -1,60 +1,70 @@
 package com.admin4tutor.bot.service;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 
+import com.admin4tutor.bot.client.WebClientService;
 import com.admin4tutor.bot.dto.DayOfWeek;
-import com.admin4tutor.bot.dto.Language;
 import com.admin4tutor.bot.dto.Tutor;
 import com.admin4tutor.bot.dto.User;
 
 public class UserSession {
     
+    private final WebClientService webClientService;
+    private final Long telegramId;
     private Stage stage;
     private User user;
-    private List<DayOfWeek> currentDays = new ArrayList<>();
-    private ReplyKeyboard currentKeyboard;
     private List<Tutor> suitableTutors;
+    private List<DayOfWeek> currentDays = new ArrayList<>(Arrays.asList(DayOfWeek.values()));
+    private ReplyKeyboard currentKeyboard;
     private DayOfWeek currentDayOfWeek;
     private Tutor currentTutor;
-    private Long telegramId;
 
-    UserSession(Stage stage, User user, Long telegramId){
+    UserSession(Stage stage, User user, Long telegramId, WebClientService webClientService){
         this.stage = stage;
         this.user = user;
         this.telegramId = telegramId;
-        for(var day: DayOfWeek.values())
-            currentDays.add(day);
+        this.webClientService = webClientService;
     }
 
-    public Stage getStage() {
+    void sendUser(){
+        webClientService.sendUser(user);
+    }
+
+    List<Tutor> getSuitableTutors() {
+        if(suitableTutors == null) suitableTutors = webClientService.
+        getSuitableTutorsFromDatabase(555L, telegramId);
+        return suitableTutors;
+    }
+
+    Stage getStage() {
         return stage;
     }
 
-    public void setStage(Stage stage) {
+    void setStage(Stage stage) {
         this.stage = stage;
     }
 
-    public User getUser() {
+    User getUser() {
         return user;
     }
 
-    public void setUser(User user) {
+    void setUser(User user) {
         this.user = user;
     }
 
-    public List<DayOfWeek> getCurrentDays() {
+    List<DayOfWeek> getCurrentDays() {
         return currentDays;
     }
 
-    public void setCurrentDays(List<DayOfWeek> currentDays) {
+    void setCurrentDays(List<DayOfWeek> currentDays) {
         this.currentDays = currentDays;
     }
 
-    public ReplyKeyboard getCurrentKeyboard() {
+    ReplyKeyboard getCurrentKeyboard() {
         return currentKeyboard;
     }
 
@@ -62,49 +72,23 @@ public class UserSession {
         this.currentKeyboard = currentKeyboard;
     }
 
-    public List<Tutor> getSuitableTutors() {
-
-        if(suitableTutors == null) suitableTutors = getSuitableTutorsFromDatabase();
-        return suitableTutors;
-    }
-
-    public void setSuitableTutors(List<Tutor> suitableTutors) {
-        this.suitableTutors = suitableTutors;
-    }
-    //PLUG!!!
-    private List<Tutor> getSuitableTutorsFromDatabase(){
-        Tutor tutor = new Tutor(555, telegramId);
-        tutor.setName("Клименко Кирилл");
-        tutor.setDateOfBirth("30.10.2001");
-        tutor.setLanguage(Language.ENGLISH);
-        tutor.setEmail("silent.30.rider.10@gmail.com");
-        tutor.setPhoneNumber("+79529170764");
-        tutor.setPrice(1000);
-        tutor.setBiography("Cool guy");
-        return Collections.singletonList(tutor);
-    }
-
-    public DayOfWeek getCurrentDayOfWeek() {
+    DayOfWeek getCurrentDayOfWeek() {
         return currentDayOfWeek;
     }
 
-    public void setCurrentDayOfWeek(DayOfWeek currentDayOfWeek) {
+    void setCurrentDayOfWeek(DayOfWeek currentDayOfWeek) {
         this.currentDayOfWeek = currentDayOfWeek;
     }
 
-    public Tutor getCurrentTutor() {
+    Tutor getCurrentTutor() {
         return currentTutor;
     }
 
-    public void setCurrentTutor(Tutor currentTutor) {
+    void setCurrentTutor(Tutor currentTutor) {
         this.currentTutor = currentTutor;
     }
 
-    public Long getTelegramId() {
+    Long getTelegramId() {
         return telegramId;
-    }
-
-    public void setTelegramId(Long telegramId) {
-        this.telegramId = telegramId;
     }
 }

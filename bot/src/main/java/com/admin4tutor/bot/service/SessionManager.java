@@ -3,17 +3,21 @@ package com.admin4tutor.bot.service;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.admin4tutor.bot.client.WebClientService;
+
 public class SessionManager {
 
     private final Map <Long, UserSession> userSessions = new ConcurrentHashMap<>();
     private final AnswerProcessor answerProcessor;
+    private final WebClientService webClientService;
 
-    public SessionManager (AnswerProcessor answerProcessor){
+    public SessionManager (AnswerProcessor answerProcessor, WebClientService webClientService){
         this.answerProcessor = answerProcessor;
+        this.webClientService = webClientService;
     }
 
     public void startSession(long chatId, long telegramId){
-        userSessions.put(chatId, new UserSession(Stage.ASKING_FOR_ROLE, null, telegramId));
+        userSessions.put(chatId, new UserSession(Stage.ASKING_FOR_ROLE, null, telegramId, webClientService));
     }
 
     public void handleUserAnswer(long chatId, String answer){
@@ -30,12 +34,13 @@ public class SessionManager {
             case Stage.ASKING_FOR_SCHEDULE_DAY -> answerProcessor.processScheduleDayAnswer(chatId, answer, session);
             case Stage.ASKING_FOR_SCHEDULE_TIME -> answerProcessor.processScheduleTimeAnswer(chatId, answer, session);
             case Stage.ASKING_FOR_ANOTHER_SCHEDULE_DAY -> answerProcessor.processAnotherScheduleDayAnswer(chatId, answer, session);
-            case Stage.ASKING_FOR_TUTOR -> answerProcessor.processTutorAnswer(chatId, answer, session);
-            case Stage.VIEWING_TUTOR_PAGE -> answerProcessor.processTutorView(chatId, answer, session);
             case Stage.ASKING_FOR_EMAIL -> answerProcessor.processEmailAnswer(chatId, answer, session);
             case Stage.ASKING_FOR_PHONE_NUMBER -> answerProcessor.processPhoneNumberAnswer(chatId, answer, session);
             case Stage.ASKING_FOR_BIOGRAPHY -> answerProcessor.processBiographyAnswer(chatId, answer, session);
-            case Stage.CREATED_ACCOUNT -> System.out.println();
+            case Stage.CHECKING_QUESTIONNAIRE_RESULTS -> answerProcessor.processChekingQuestionnaireAnswer(chatId, answer, session);
+            case Stage.ASKING_FOR_TUTOR -> answerProcessor.processTutorAnswer(chatId, answer, session);
+            case Stage.VIEWING_TUTOR_PAGE -> answerProcessor.processTutorView(chatId, answer, session);
+            case Stage.SENDING_USER_TO_SERVER -> System.out.println();   
         }
     }
 
