@@ -57,4 +57,7 @@ public class Tutor {
 
     @OneToMany(mappedBy = "tutor", cascade = CascadeType.ALL)
     private List <Availability> availabilities;
+
+    @OneToMany(mappedBy="tutor", cascade = CascadeType.ALL)
+    private List<Student> students;
 }
