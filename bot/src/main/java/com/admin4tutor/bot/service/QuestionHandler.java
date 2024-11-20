@@ -11,10 +11,10 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 
 import com.admin4tutor.bot.TelegramBot;
-import com.admin4tutor.bot.model.DayOfWeek;
-import com.admin4tutor.bot.model.Language;
-import com.admin4tutor.bot.model.Tutor;
-import com.admin4tutor.bot.model.User;
+import com.admin4tutor.bot.dto.DayOfWeek;
+import com.admin4tutor.bot.dto.Language;
+import com.admin4tutor.bot.dto.Tutor;
+import com.admin4tutor.bot.dto.User;
 
 public class QuestionHandler {
     private final TelegramBot bot;
@@ -104,6 +104,10 @@ public class QuestionHandler {
         String text = "Выберите еще один день недели для указания интервалов доступности," +
         " либо нажмите \"Готово\"";
         bot.sendMessage(chatId, text, keyboardMarkup);
+    }
+
+    void askForPrice(long chatId){
+        bot.sendMessage(chatId, "Укажите желаемую цену за занятие в рублях 💰", null);
     }
 
     void askForScheduleDay(long chatId, User user){

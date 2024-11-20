@@ -54,9 +54,9 @@ public class TelegramBot extends TelegramLongPollingBot {
             Message message = update.getMessage();
             long chatId = message.getChatId();
             String text = message.getText();
-            //long telegramId = message.getFrom().getId();
+            long telegramId = message.getFrom().getId();
             if(text.equals("/start")){
-                sessionManager.startSession(chatId);
+                sessionManager.startSession(chatId, telegramId);
                 startConversation(chatId);
             } else {
                 sessionManager.handleUserAnswer(chatId, text);

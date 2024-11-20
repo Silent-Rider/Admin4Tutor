@@ -37,6 +37,9 @@ public class Tutor {
     @Column(name = "language", columnDefinition = "VARCHAR(15)", nullable = false)
     private Set <Language> languages = new HashSet<>();
 
+    @Column(nullable = false)
+    private Integer price;
+
     @Column(unique = true)
     private String email;
 

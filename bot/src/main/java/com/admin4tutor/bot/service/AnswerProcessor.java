@@ -1,11 +1,11 @@
 package com.admin4tutor.bot.service;
 
 import com.admin4tutor.bot.TelegramBot;
-import com.admin4tutor.bot.model.DayOfWeek;
-import com.admin4tutor.bot.model.Language;
-import com.admin4tutor.bot.model.Student;
-import com.admin4tutor.bot.model.Tutor;
-import com.admin4tutor.bot.model.User;
+import com.admin4tutor.bot.dto.DayOfWeek;
+import com.admin4tutor.bot.dto.Language;
+import com.admin4tutor.bot.dto.Student;
+import com.admin4tutor.bot.dto.Tutor;
+import com.admin4tutor.bot.dto.User;
 
 public class AnswerProcessor {
     
@@ -20,12 +20,12 @@ public class AnswerProcessor {
     void processRoleAnswer(long chatId, String answer, UserSession session){
         switch (answer) {
             case "🧑🏼‍🎓 Я студент" -> {
-                session.setUser(new Student());
+                session.setUser(new Student(chatId, session.getTelegramId()));
                 session.setStage(Stage.ASKING_FOR_LANGUAGE);
                 questionHandler.askForLanguage(chatId, session.getUser());
             }
             case "🧑🏻‍🏫 Я репетитор" -> {
-                session.setUser(new Tutor());
+                session.setUser(new Tutor(chatId, session.getTelegramId()));
                 session.setStage(Stage.ASKING_FOR_LANGUAGE);
                 questionHandler.askForLanguage(chatId, session.getUser());
             }
@@ -128,8 +128,8 @@ public class AnswerProcessor {
             case "SATURDAY" -> session.setCurrentDayOfWeek(DayOfWeek.SATURDAY);
             case "SUNDAY" -> session.setCurrentDayOfWeek(DayOfWeek.SUNDAY);
             case "READY" -> {
-                session.setStage(Stage.ASKING_FOR_EMAIL);
-                questionHandler.askForEmail(chatId);
+                session.setStage(Stage.ASKING_FOR_PRICE);
+                questionHandler.askForPrice(chatId);
                 return;
             }
             default -> {
@@ -141,6 +141,19 @@ public class AnswerProcessor {
         }
         session.setStage(Stage.ASKING_FOR_AVAILABILITY_INTERVALS);
         questionHandler.askForAvailabilityIntervals(chatId, answer);
+    }
+
+    void processPriceAnswer(long chatId, String answer, UserSession session){
+        Tutor tutor = (Tutor) session.getUser();
+        if(answer.matches("\\d+")) tutor.setPrice(Integer.valueOf(answer));
+        else {
+            bot.sendMessage(chatId, "Недопустимые символы\n".
+            concat("Пожалуйста, укажите желаемую цену за занятие в рублях 💰"), session.getCurrentKeyboard());
+            return;
+
+        }
+        session.setStage(Stage.ASKING_FOR_EMAIL);
+        questionHandler.askForEmail(chatId);
     }
 
     void processScheduleDayAnswer(long chatId, String answer, UserSession session){
@@ -206,6 +219,7 @@ public class AnswerProcessor {
         for(var suitableTutor: session.getSuitableTutors())
             if(suitableTutor.getName().equals(answer.trim())){
                 tutor = suitableTutor;
+                session.setCurrentTutor(tutor);
                 break;
             }
         if(tutor == null){
@@ -218,8 +232,10 @@ public class AnswerProcessor {
     }
 
     void processTutorView(long chatId, String answer, UserSession session){
+        Student student = (Student) session.getUser();
         switch (answer) {
             case "Записаться" -> {
+                student.setTutorId(session.getCurrentTutor().getTelegramId());
                 session.setStage(Stage.ASKING_FOR_EMAIL);
                 questionHandler.askForEmail(chatId);
             }
@@ -251,7 +267,7 @@ public class AnswerProcessor {
 
     void processBiographyAnswer(long chatId, String answer, UserSession session){
         Tutor tutor = (Tutor) session.getUser();
-        if(answer.length() > 15) tutor.setBiography(answer);
+        if(answer.length() > 14) tutor.setBiography(answer);
         else {
             bot.sendMessage(chatId,"Биография слишком короткая. Напишите не менее 15 символов", 
             session.getCurrentKeyboard());
@@ -259,7 +275,6 @@ public class AnswerProcessor {
         }
         session.setStage(Stage.CREATED_ACCOUNT);
         printInformation(chatId, session.getUser());
-
     }
     //Just for testing. Remove after!
     void printInformation(long chatId, User user){

@@ -1,4 +1,4 @@
-package com.admin4tutor.bot.model;
+package com.admin4tutor.bot.dto;
 
 public enum DayOfWeek {
     MONDAY("Понедельник"),

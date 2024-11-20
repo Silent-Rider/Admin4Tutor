@@ -1,4 +1,4 @@
-package com.admin4tutor.bot.model;
+package com.admin4tutor.bot.dto;
 
 import java.time.LocalDate;
 import java.time.Period;
@@ -14,6 +14,11 @@ public abstract class User {
     private String phoneNumber;
     private String dateOfBirth;
     
+    protected User(long chatId, long telegramId){
+        this.chatId = chatId;
+        this.telegramId = telegramId;
+    }
+
     public Long getChatId() {
         return chatId;
     }
@@ -57,16 +62,23 @@ public abstract class User {
         this.dateOfBirth = dateOfBirth;
     }
 
-    public int getAge(){
+    public String getAge(){
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
         LocalDate date = LocalDate.parse(dateOfBirth, formatter);
-        return Period.between(date, LocalDate.now()).getYears();
+        String age = String.valueOf(Period.between(date, LocalDate.now()).getYears());
+        if(age.length() > 1 && age.substring(age.length()-2, age.length()).matches("1[1-9]"))
+            return age + " лет";
+        else if(age.substring(age.length()-1, age.length()).matches("1"))
+            return age + " год";
+        else if(age.substring(age.length()-1, age.length()).matches("[2-4]"))
+            return age + " года";
+        return age + " лет";
     }
 
     @Override
     public String toString(){
-        return name + "\nВозраст: " + getAge() + "\nЯзык: " + language.getValue() + 
-        (email == null ? "" : "\nПочта: " + email) + 
+        return name + "\nВозраст: " + getAge() + "\n" + (this instanceof Tutor ? "Преподаю: " : "Изучаю: ") + 
+        language.getValue() + (email == null ? "" : "\nПочта: " + email) + 
         (phoneNumber == null ? "" : "\nНомер телефона: " + phoneNumber);
     }
 }

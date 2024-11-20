@@ -6,10 +6,10 @@ import java.util.List;
 
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 
-import com.admin4tutor.bot.model.DayOfWeek;
-import com.admin4tutor.bot.model.Language;
-import com.admin4tutor.bot.model.Tutor;
-import com.admin4tutor.bot.model.User;
+import com.admin4tutor.bot.dto.DayOfWeek;
+import com.admin4tutor.bot.dto.Language;
+import com.admin4tutor.bot.dto.Tutor;
+import com.admin4tutor.bot.dto.User;
 
 public class UserSession {
     
@@ -19,10 +19,13 @@ public class UserSession {
     private ReplyKeyboard currentKeyboard;
     private List<Tutor> suitableTutors;
     private DayOfWeek currentDayOfWeek;
+    private Tutor currentTutor;
+    private Long telegramId;
 
-    UserSession(Stage stage, User user){
+    UserSession(Stage stage, User user, Long telegramId){
         this.stage = stage;
         this.user = user;
+        this.telegramId = telegramId;
         for(var day: DayOfWeek.values())
             currentDays.add(day);
     }
@@ -60,6 +63,7 @@ public class UserSession {
     }
 
     public List<Tutor> getSuitableTutors() {
+
         if(suitableTutors == null) suitableTutors = getSuitableTutorsFromDatabase();
         return suitableTutors;
     }
@@ -69,12 +73,13 @@ public class UserSession {
     }
     //PLUG!!!
     private List<Tutor> getSuitableTutorsFromDatabase(){
-        Tutor tutor = new Tutor();
+        Tutor tutor = new Tutor(555, telegramId);
         tutor.setName("Клименко Кирилл");
         tutor.setDateOfBirth("30.10.2001");
         tutor.setLanguage(Language.ENGLISH);
         tutor.setEmail("silent.30.rider.10@gmail.com");
         tutor.setPhoneNumber("+79529170764");
+        tutor.setPrice(1000);
         tutor.setBiography("Cool guy");
         return Collections.singletonList(tutor);
     }
@@ -85,5 +90,21 @@ public class UserSession {
 
     public void setCurrentDayOfWeek(DayOfWeek currentDayOfWeek) {
         this.currentDayOfWeek = currentDayOfWeek;
+    }
+
+    public Tutor getCurrentTutor() {
+        return currentTutor;
+    }
+
+    public void setCurrentTutor(Tutor currentTutor) {
+        this.currentTutor = currentTutor;
+    }
+
+    public Long getTelegramId() {
+        return telegramId;
+    }
+
+    public void setTelegramId(Long telegramId) {
+        this.telegramId = telegramId;
     }
 }

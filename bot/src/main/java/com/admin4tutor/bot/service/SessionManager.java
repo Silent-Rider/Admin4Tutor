@@ -12,8 +12,8 @@ public class SessionManager {
         this.answerProcessor = answerProcessor;
     }
 
-    public void startSession(long chatId){
-        userSessions.put(chatId, new UserSession(Stage.ASKING_FOR_ROLE, null));
+    public void startSession(long chatId, long telegramId){
+        userSessions.put(chatId, new UserSession(Stage.ASKING_FOR_ROLE, null, telegramId));
     }
 
     public void handleUserAnswer(long chatId, String answer){
@@ -26,6 +26,7 @@ public class SessionManager {
             case Stage.ASKING_FOR_AVAILABILITY_DAY -> answerProcessor.processAvailabilityDayAnswer(chatId, answer, session);
             case Stage.ASKING_FOR_AVAILABILITY_INTERVALS -> answerProcessor.processAvailabilityIntervalsAnswer(chatId, answer, session);
             case Stage.ASKING_FOR_ANOTHER_AVAILABILITY_DAY -> answerProcessor.processAnotherAvailabilityDayAnswer(chatId, answer, session);
+            case Stage.ASKING_FOR_PRICE -> answerProcessor.processPriceAnswer(chatId, answer, session);
             case Stage.ASKING_FOR_SCHEDULE_DAY -> answerProcessor.processScheduleDayAnswer(chatId, answer, session);
             case Stage.ASKING_FOR_SCHEDULE_TIME -> answerProcessor.processScheduleTimeAnswer(chatId, answer, session);
             case Stage.ASKING_FOR_ANOTHER_SCHEDULE_DAY -> answerProcessor.processAnotherScheduleDayAnswer(chatId, answer, session);
