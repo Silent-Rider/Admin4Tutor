@@ -32,6 +32,7 @@ services:
       context: ./bot
     container_name: admin4tutor-bot
     environment:
+      SPRING_PROFILES_ACTIVE: docker
       TELEGRAM_BOT_USERNAME: tutormanager_bot
       TELEGRAM_BOT_TOKEN: 7869551904:AAEh6CK_NBfY2H8k8emkfIqV6d5aA25SEic
       SERVER_API_URL: http://server:8080
