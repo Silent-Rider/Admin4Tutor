@@ -9,6 +9,11 @@
             "name": "telegram.bot.username",
             "type": "java.lang.String",
             "description": "Telegram bot username"
+        },
+        {
+            "name": "server.api.url",
+            "type": "java.lang.String",
+            "description": "URL for server connection"
         }
     ]
 }
