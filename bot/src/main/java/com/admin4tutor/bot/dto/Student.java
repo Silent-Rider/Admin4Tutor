@@ -15,9 +15,11 @@ public class Student extends User {
     public Map<DayOfWeek, String> getSchedule() {
         return schedule;
     }
+
     public Long getTutorId() {
         return tutorId;
     }
+    
     public void setTutorId(Long tutorId) {
         this.tutorId = tutorId;
     }

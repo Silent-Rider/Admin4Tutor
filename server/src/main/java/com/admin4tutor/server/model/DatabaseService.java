@@ -15,5 +15,8 @@ public class DatabaseService {
     private StudentRepository studentRepository;
     private TutorRepository tutorRepository;
 
+    public void saveTutor(){
+        
+    }
     
 }
