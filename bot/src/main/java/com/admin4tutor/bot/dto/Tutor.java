@@ -3,10 +3,18 @@ package com.admin4tutor.bot.dto;
 import java.util.HashMap;
 import java.util.Map;
 
+import lombok.Getter;
+import lombok.Setter;
+
 public class Tutor extends User {
     
+    @Getter @Setter
     private String biography;
+    
+    @Getter @Setter
     private Integer price;
+    
+    @Getter
     private final Map<DayOfWeek, String> availability = new HashMap<>(7){{
         put(DayOfWeek.MONDAY, null);
         put(DayOfWeek.TUESDAY, null);
@@ -19,26 +27,6 @@ public class Tutor extends User {
 
     public Tutor(long chatId, long telegramId) {
         super(chatId, telegramId);
-    }
-    
-    public Map<DayOfWeek, String> getAvailability() {
-        return availability;
-    }
-    
-    public String getBiography() {
-        return biography;
-    }
-
-    public void setBiography(String biography) {
-        this.biography = biography;
-    }
-
-    public Integer getPrice() {
-        return price;
-    }
-
-    public void setPrice(Integer price) {
-        this.price = price;
     }
 
     private String getPriceString(){

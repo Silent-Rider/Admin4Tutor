@@ -3,25 +3,19 @@ package com.admin4tutor.bot.dto;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import lombok.Getter;
+import lombok.Setter;
+
 public class Student extends User {
     
+    @Getter
     private final Map<DayOfWeek, String> schedule = new ConcurrentHashMap<>();
+    
+    @Getter @Setter
     private Long tutorId;
 
     public Student(long chatId, long telegramId) {
         super(chatId, telegramId);
-    }
-    
-    public Map<DayOfWeek, String> getSchedule() {
-        return schedule;
-    }
-
-    public Long getTutorId() {
-        return tutorId;
-    }
-    
-    public void setTutorId(Long tutorId) {
-        this.tutorId = tutorId;
     }
 
     @Override

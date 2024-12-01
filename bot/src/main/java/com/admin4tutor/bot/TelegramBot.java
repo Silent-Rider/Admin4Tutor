@@ -4,9 +4,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -21,33 +20,30 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import com.admin4tutor.bot.client.WebClientService;
-import com.admin4tutor.bot.service.AnswerProcessor;
 import com.admin4tutor.bot.service.SessionManager;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Component
 public class TelegramBot extends TelegramLongPollingBot {
 
-    public static final Logger logger = LoggerFactory.getLogger(TelegramBot.class);
     private final String botToken;
     private final String botUsername;
     private final SessionManager sessionManager;
-    private final WebClientService webClientService;
 
     public TelegramBot (@Value("${telegram.bot.token}") String botToken,
-    @Value("${telegram.bot.username}")String botUsername,
-    WebClientService webClientService) {
+    @Value("${telegram.bot.username}")String botUsername,  @Lazy SessionManager sessionManager) {
         super(new DefaultBotOptions(), botToken);
         this.botToken = botToken;
         this.botUsername = botUsername;
-        this.webClientService = webClientService;
-        this.sessionManager = new SessionManager(new AnswerProcessor(this), this.webClientService);
+        this.sessionManager = sessionManager;
     }
     
     @Override
     public void onUpdateReceived(Update update) {
         CompletableFuture.runAsync(() -> processUpdate(update)).exceptionally(e -> {
-                logger.error("Exception during async processing of update", e);
+                log.error("Exception during async processing of update", e);
                 return null;
             });
     }
@@ -95,7 +91,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         try{
             execute(message);
         } catch(TelegramApiException e){
-            logger.error("TelegramApiException occurred while sending a message to user: {}", chatId, e);
+            log.error("TelegramApiException occurred while sending a message to user: {}", chatId, e);
         }
     }
 

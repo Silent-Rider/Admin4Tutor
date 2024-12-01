@@ -8,7 +8,7 @@ import lombok.Data;
 
 @Data
 public abstract class User {
-    
+
     private Long chatId;
     private Long telegramId;
     private String name;

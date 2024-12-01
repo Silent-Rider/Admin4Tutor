@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
@@ -18,7 +19,12 @@ import com.admin4tutor.bot.dto.Student;
 import com.admin4tutor.bot.dto.Tutor;
 import com.admin4tutor.bot.dto.User;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Service
 public class QuestionHandler {
+    
     private final TelegramBot bot;
 
     public QuestionHandler(TelegramBot bot){
@@ -72,7 +78,7 @@ public class QuestionHandler {
         for(DayOfWeek day: DayOfWeek.values())
             if(day.toString().equals(answer)) dayOfWeek = day;
         if(dayOfWeek == null){
-            TelegramBot.logger.error("Lost day of week value");
+            log.error("Lost day of week value");
             return;
         }
         String text = String.format("%s: Укажите один или более интервалов доступности " + 
@@ -131,7 +137,7 @@ public class QuestionHandler {
         for(DayOfWeek day: DayOfWeek.values())
             if(day.toString().equals(answer)) dayOfWeek = day;
         if(dayOfWeek == null){
-            TelegramBot.logger.error("Lost day of week value");
+            log.error("Lost day of week value");
             return;
         }
         String text = String.format("%s: Укажите время начала занятия " + 
@@ -209,7 +215,7 @@ public class QuestionHandler {
             }
             case Student student -> bot.sendMessage(chatId, student.toString(), keyboardMarkup);
             default -> {
-                TelegramBot.logger.error("Lost type of user");
+                log.error("Lost type of user");
             }
         }
     }

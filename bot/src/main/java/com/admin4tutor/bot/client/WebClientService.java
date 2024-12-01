@@ -3,23 +3,23 @@ package com.admin4tutor.bot.client;
 import java.util.Collections;
 import java.util.List;
 
-import org.slf4j.Logger;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
-import com.admin4tutor.bot.TelegramBot;
 import com.admin4tutor.bot.dto.Language;
 import com.admin4tutor.bot.dto.Student;
 import com.admin4tutor.bot.dto.Tutor;
 import com.admin4tutor.bot.dto.User;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class WebClientService {
 
     private final WebClient webClient;
-    private final Logger logger = TelegramBot.logger;
 
     public WebClientService(WebClient webClient){
         this.webClient = webClient;
@@ -29,7 +29,7 @@ public class WebClientService {
         switch(user){
             case Tutor tutor -> sendTutor(tutor);
             case Student student -> sendStudent(student);
-            default -> logger.error("Lost type of user");
+            default -> log.error("Lost type of user");
         }
     }
 
@@ -42,9 +42,9 @@ public class WebClientService {
             retrieve().
             toBodilessEntity().
             block();
-            logger.info("New tutor successfully send to webserver");
+            log.info("New tutor successfully send to webserver");
         } catch (WebClientResponseException e) {
-            logger.error("Error while sending tutor data: " + e.getMessage());
+            log.error("Error while sending tutor data: " + e.getMessage());
         }
     }
 

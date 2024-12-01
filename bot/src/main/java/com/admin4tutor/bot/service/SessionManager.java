@@ -3,21 +3,24 @@ package com.admin4tutor.bot.service;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.admin4tutor.bot.client.WebClientService;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Service;
 
+@Service
 public class SessionManager {
 
     private final Map <Long, UserSession> userSessions = new ConcurrentHashMap<>();
     private final AnswerProcessor answerProcessor;
-    private final WebClientService webClientService;
+    private final UserSessionFactory userSessionFactory;
 
-    public SessionManager (AnswerProcessor answerProcessor, WebClientService webClientService){
+    public SessionManager (@Lazy AnswerProcessor answerProcessor, UserSessionFactory userSessionFactory){
         this.answerProcessor = answerProcessor;
-        this.webClientService = webClientService;
+        this.userSessionFactory = userSessionFactory;
     }
 
     public void startSession(long chatId, long telegramId){
-        userSessions.put(chatId, new UserSession(Stage.ASKING_FOR_ROLE, null, telegramId, webClientService));
+        UserSession session = userSessionFactory.createUserSession(Stage.ASKING_FOR_ROLE, telegramId);
+        userSessions.put(chatId, session);
     }
 
     public void handleUserAnswer(long chatId, String answer){

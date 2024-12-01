@@ -1,5 +1,7 @@
 package com.admin4tutor.bot.dto;
 
+import lombok.Getter;
+
 public enum Language {
     ENGLISH("🇬🇧 Английский"),
     GERMAN("🇩🇪 Немецкий"),
@@ -10,13 +12,10 @@ public enum Language {
     JAPANESE("🇯🇵 Японский"),
     KOREAN("🇰🇷 Корейский");
 
+    @Getter
     private final String value;
 
     private Language(String value){
         this.value = value;
-    }
-
-    public String getValue(){
-        return value;
     }
 }

@@ -10,6 +10,8 @@ public class WebClientConfig {
 
     @Bean
     public WebClient webClient(WebClient.Builder builder, @Value("${server.api.url}") String baseUrl){
-        return builder.baseUrl(baseUrl).build();
+        return builder
+        .baseUrl(baseUrl)
+        .build();
     }
 }

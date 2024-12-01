@@ -1,5 +1,8 @@
 package com.admin4tutor.bot.service;
 
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Service;
+
 import com.admin4tutor.bot.TelegramBot;
 import com.admin4tutor.bot.dto.DayOfWeek;
 import com.admin4tutor.bot.dto.Language;
@@ -7,14 +10,15 @@ import com.admin4tutor.bot.dto.Student;
 import com.admin4tutor.bot.dto.Tutor;
 import com.admin4tutor.bot.dto.User;
 
+@Service
 public class AnswerProcessor {
     
     private final TelegramBot bot;
     private final QuestionHandler questionHandler;
 
-    public AnswerProcessor(TelegramBot bot){
+    public AnswerProcessor(@Lazy TelegramBot bot, QuestionHandler questionHandler){
         this.bot = bot;
-        questionHandler = new QuestionHandler(bot);
+        this.questionHandler = questionHandler;
     }
 
     void processRoleAnswer(long chatId, String answer, UserSession session){

@@ -1,5 +1,7 @@
 package com.admin4tutor.bot.dto;
 
+import lombok.Getter;
+
 public enum DayOfWeek {
     MONDAY("Понедельник"),
     TUESDAY("Вторник"),
@@ -9,13 +11,10 @@ public enum DayOfWeek {
     SATURDAY("Суббота"),
     SUNDAY("Воскресенье");
 
+    @Getter
     private final String value;
 
     private DayOfWeek(String value){
         this.value = value;
-    }
-
-    public String getValue(){
-        return value;
     }
 }

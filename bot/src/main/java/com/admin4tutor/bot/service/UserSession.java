@@ -11,21 +11,39 @@ import com.admin4tutor.bot.dto.DayOfWeek;
 import com.admin4tutor.bot.dto.Tutor;
 import com.admin4tutor.bot.dto.User;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
+
 public class UserSession {
     
     private final WebClientService webClientService;
+    
+    @Getter(AccessLevel.PACKAGE)
     private final Long telegramId;
+    
+    @Getter(AccessLevel.PACKAGE) @Setter(AccessLevel.PACKAGE)
     private Stage stage;
+    
+    @Getter(AccessLevel.PACKAGE) @Setter(AccessLevel.PACKAGE)
     private User user;
+
     private List<Tutor> suitableTutors;
+
+    @Getter(AccessLevel.PACKAGE) @Setter(AccessLevel.PACKAGE)
     private List<DayOfWeek> currentDays = new ArrayList<>(Arrays.asList(DayOfWeek.values()));
+
+    @Getter @Setter
     private ReplyKeyboard currentKeyboard;
+    
+    @Getter(AccessLevel.PACKAGE) @Setter(AccessLevel.PACKAGE)
     private DayOfWeek currentDayOfWeek;
+
+    @Getter(AccessLevel.PACKAGE) @Setter(AccessLevel.PACKAGE)
     private Tutor currentTutor;
 
-    UserSession(Stage stage, User user, Long telegramId, WebClientService webClientService){
+    UserSession(Stage stage, Long telegramId, WebClientService webClientService){
         this.stage = stage;
-        this.user = user;
         this.telegramId = telegramId;
         this.webClientService = webClientService;
     }
@@ -38,57 +56,5 @@ public class UserSession {
         if(suitableTutors == null) suitableTutors = webClientService.
         getSuitableTutorsFromDatabase(555L, telegramId);
         return suitableTutors;
-    }
-
-    Stage getStage() {
-        return stage;
-    }
-
-    void setStage(Stage stage) {
-        this.stage = stage;
-    }
-
-    User getUser() {
-        return user;
-    }
-
-    void setUser(User user) {
-        this.user = user;
-    }
-
-    List<DayOfWeek> getCurrentDays() {
-        return currentDays;
-    }
-
-    void setCurrentDays(List<DayOfWeek> currentDays) {
-        this.currentDays = currentDays;
-    }
-
-    ReplyKeyboard getCurrentKeyboard() {
-        return currentKeyboard;
-    }
-
-    public void setCurrentKeyboard(ReplyKeyboard currentKeyboard) {
-        this.currentKeyboard = currentKeyboard;
-    }
-
-    DayOfWeek getCurrentDayOfWeek() {
-        return currentDayOfWeek;
-    }
-
-    void setCurrentDayOfWeek(DayOfWeek currentDayOfWeek) {
-        this.currentDayOfWeek = currentDayOfWeek;
-    }
-
-    Tutor getCurrentTutor() {
-        return currentTutor;
-    }
-
-    void setCurrentTutor(Tutor currentTutor) {
-        this.currentTutor = currentTutor;
-    }
-
-    Long getTelegramId() {
-        return telegramId;
     }
 }
