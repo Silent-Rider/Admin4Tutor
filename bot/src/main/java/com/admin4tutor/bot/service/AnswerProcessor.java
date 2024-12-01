@@ -1,5 +1,9 @@
 package com.admin4tutor.bot.service;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
@@ -59,7 +63,7 @@ public class AnswerProcessor {
     }
     
     void processNameAnswer(long chatId, String answer, UserSession session){
-        if(answer.matches("[А-Яа-я]+? [А-Яа-я]+?")) session.getUser().setName(answer.trim());
+        if(answer.matches("[А-Яа-яA-Za-z]+? [А-Яа-яA-Za-z]+?")) session.getUser().setName(answer.trim());
         else {
             bot.sendMessage(chatId, "Неверный формат имени. " +
             "Пожалуйста, введите фамилию и имя через пробел", session.getCurrentKeyboard());
@@ -70,7 +74,8 @@ public class AnswerProcessor {
     }
     
     void processDateOfBirthAnswer(long chatId, String answer, UserSession session){
-        if(answer.matches("\\d{2}\\.\\d{2}\\.\\d{4}")) session.getUser().setDateOfBirth(answer);
+        if(answer.matches("^([0-2][0-9]|3[01])\\.(0[1-9]|1[0-2])\\.\\d{4}$")) 
+            session.getUser().setDateOfBirth(answer);
         else {
             bot.sendMessage(chatId, "Неверный формат даты. " + 
             "Пожалуйста, напишите вашу дату рождения в формате \"ДД.ММ.ГГГГ\"", session.getCurrentKeyboard());
@@ -96,7 +101,7 @@ public class AnswerProcessor {
             case "SATURDAY" -> session.setCurrentDayOfWeek(DayOfWeek.SATURDAY);
             case "SUNDAY" -> session.setCurrentDayOfWeek(DayOfWeek.SUNDAY);
             default -> {
-                bot.sendMessage(chatId,"Пожалуйста, выберите один из дней недели",
+                bot.sendMessage(chatId,"Пожалуйста, выберите один из предложенных дней недели",
                 session.getCurrentKeyboard());
                 return;
             }
@@ -108,9 +113,10 @@ public class AnswerProcessor {
     void processAvailabilityIntervalsAnswer(long chatId, String answer, UserSession session){
         Tutor tutor = (Tutor) session.getUser();
         if(answer.matches("^([0-1][0-9]|2[0-3]):[0-5][0-9]-([0-1][0-9]|2[0-3]):[0-5][0-9]" + 
-        "(, ?([0-1][0-9]|2[0-3]):[0-5][0-9]-([0-1][0-9]|2[0-3]):[0-5][0-9])*$"))
-        tutor.getAvailability().put(session.getCurrentDayOfWeek(), answer);
-        else {
+        "(, ?([0-1][0-9]|2[0-3]):[0-5][0-9]-([0-1][0-9]|2[0-3]):[0-5][0-9])*$")){
+            List<String> intervals = new ArrayList<>(Arrays.asList(answer.split(", ?")));
+            tutor.getAvailability().put(session.getCurrentDayOfWeek(), intervals);
+        } else {
             String text = String.format("Неверный формат интервалов%n" + 
             "%s: Укажите один или более интервалов доступности " + 
             "в формате \"ЧЧ:ММ-ЧЧ:ММ\", перечисляя их через запятую 🕰%n", 
@@ -170,7 +176,7 @@ public class AnswerProcessor {
             case "SATURDAY" -> session.setCurrentDayOfWeek(DayOfWeek.SATURDAY);
             case "SUNDAY" -> session.setCurrentDayOfWeek(DayOfWeek.SUNDAY);
             default -> {
-                bot.sendMessage(chatId,"Пожалуйста, выберите один из дней недели",
+                bot.sendMessage(chatId,"Пожалуйста, выберите один из предложенных дней недели",
                 session.getCurrentKeyboard());
                 return;
             }
@@ -219,14 +225,28 @@ public class AnswerProcessor {
     }
 
     void processEmailAnswer(long chatId, String answer, UserSession session){
-        if(!answer.equals("Пропустить")) session.getUser().setEmail(answer);
+        if(!answer.equals("Пропустить")) {
+            if(!answer.contains("@")){
+                bot.sendMessage(chatId, "Неверный формат электронной почты. " +
+                "Адрес электронной почты должен содержать символ @, " + 
+                "пожалуйста, попробуйте ввести заново" , session.getCurrentKeyboard());
+                return;
+            } else session.getUser().setEmail(answer);
+        }
         session.setStage(Stage.ASKING_FOR_PHONE_NUMBER);
         questionHandler.askForPhoneNumber(chatId);
     }
 
     void processPhoneNumberAnswer(long chatId, String answer, UserSession session){
         User user = session.getUser();
-        if(!answer.equals("Пропустить")) user.setPhoneNumber(answer);
+        if(!answer.equals("Пропустить")){
+            if(!answer.matches("\\+?[0-9]{5,15}")){
+                bot.sendMessage(chatId, "Неверный формат номера телефона. " +
+                "Номер телефона может содержать цифры от 0 до 9 и опционально знак + вначале, " + 
+                "пожалуйста, попробуйте ввести заново" , session.getCurrentKeyboard());
+                return;
+            } else user.setPhoneNumber(answer);
+        }
         if(user instanceof Tutor){
             session.setStage(Stage.ASKING_FOR_BIOGRAPHY);
             questionHandler.askForBiography(chatId);

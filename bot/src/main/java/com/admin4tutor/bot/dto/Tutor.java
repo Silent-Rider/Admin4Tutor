@@ -1,7 +1,9 @@
 package com.admin4tutor.bot.dto;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -15,15 +17,20 @@ public class Tutor extends User {
     private Integer price;
     
     @Getter
-    private final Map<DayOfWeek, String> availability = new HashMap<>(7){{
-        put(DayOfWeek.MONDAY, null);
-        put(DayOfWeek.TUESDAY, null);
-        put(DayOfWeek.WEDNESDAY, null);
-        put(DayOfWeek.THURSDAY, null);
-        put(DayOfWeek.FRIDAY, null);
-        put(DayOfWeek.SATURDAY, null);
-        put(DayOfWeek.SUNDAY, null);
-    }};
+    private final Map<DayOfWeek, List<String>> availability;
+
+    {
+        List<String> busy = new ArrayList<>();
+        availability = new ConcurrentHashMap<>(7){{
+            put(DayOfWeek.MONDAY, busy);
+            put(DayOfWeek.TUESDAY, busy);
+            put(DayOfWeek.WEDNESDAY, busy);
+            put(DayOfWeek.THURSDAY, busy);
+            put(DayOfWeek.FRIDAY, busy);
+            put(DayOfWeek.SATURDAY, busy);
+            put(DayOfWeek.SUNDAY, busy);
+        }};
+    }
 
     public Tutor(long chatId, long telegramId) {
         super(chatId, telegramId);

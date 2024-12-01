@@ -25,7 +25,7 @@ public class Tutor {
     @Column(name = "chat_id", unique = true, nullable = false)
     private Long chatId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String name;
 
     @Column(name = "date_of_birth", nullable = false)

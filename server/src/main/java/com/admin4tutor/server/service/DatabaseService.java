@@ -1,11 +1,11 @@
-package com.admin4tutor.server.model;
+package com.admin4tutor.server.service;
 
 import org.springframework.stereotype.Service;
 
-import com.admin4tutor.server.model.repositories.AvailabilityRepository;
-import com.admin4tutor.server.model.repositories.LessonRepository;
-import com.admin4tutor.server.model.repositories.StudentRepository;
-import com.admin4tutor.server.model.repositories.TutorRepository;
+import com.admin4tutor.server.service.repositories.AvailabilityRepository;
+import com.admin4tutor.server.service.repositories.LessonRepository;
+import com.admin4tutor.server.service.repositories.StudentRepository;
+import com.admin4tutor.server.service.repositories.TutorRepository;
 
 @Service
 public class DatabaseService {

@@ -1,4 +1,4 @@
-package com.admin4tutor.server.model.repositories;
+package com.admin4tutor.server.service.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
