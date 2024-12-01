@@ -1,5 +1,6 @@
 package com.admin4tutor.bot.client;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
+import com.admin4tutor.bot.dto.Availability;
 import com.admin4tutor.bot.dto.Language;
 import com.admin4tutor.bot.dto.Student;
 import com.admin4tutor.bot.dto.Tutor;
@@ -27,13 +29,16 @@ public class WebClientService {
 
     public void sendUser(User user){
         switch(user){
-            case Tutor tutor -> sendTutor(tutor);
+            case Tutor tutor -> {
+                sendTutor(tutor);
+                sendAvailabilities(tutor);
+            }
             case Student student -> sendStudent(student);
             default -> log.error("Lost type of user");
         }
     }
 
-    private void sendTutor(Tutor tutor){
+    private void sendTutor(Tutor tutor){ 
         try {
             webClient.post().
             uri(ServerPaths.TUTORS_URI).
@@ -48,8 +53,38 @@ public class WebClientService {
         }
     }
 
-    private void sendStudent(Student student){
+    private void sendAvailabilities(Tutor tutor){
+        List<Availability> availabilities = new ArrayList<>();
+        for(var dayOfWeek: tutor.getAvailability().keySet()){
+            List<String> intervals = tutor.getAvailability().get(dayOfWeek);
+            if(intervals.isEmpty()) continue;
+            for(var interval: intervals){
+                String[] times = interval.split("-");
+                Availability availability = Availability.builder().startTime(times[0]).
+                endTime(times[1]).dayOfWeek(dayOfWeek).build();
+                availabilities.add(availability);
+            }
+        }
+        try {
+            webClient.post().
+            uri(uriBuilder -> {
+                return uriBuilder
+                .path(ServerPaths.AVAILABILITIES_URI)
+                .queryParam("telegramId", tutor.getTelegramId())
+                .build(); }).
+            contentType(MediaType.APPLICATION_JSON).
+            bodyValue(availabilities).
+            retrieve().
+            toBodilessEntity().
+            block();
+            log.info("Tutor's availabilities successfully send to webserver");
+        } catch (WebClientResponseException e) {
+            log.error("Error while sending tutor's availabilities: " + e.getMessage());
+        }
+    }
 
+    private void sendStudent(Student student){
+        System.out.println(student);
     }
 
     //PLUG!!!

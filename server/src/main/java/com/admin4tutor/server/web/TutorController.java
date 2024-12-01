@@ -1,18 +1,42 @@
 package com.admin4tutor.server.web;
 
-import org.springframework.web.bind.annotation.RestController;
+import java.util.List;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.admin4tutor.server.model.entities.Availability;
+import com.admin4tutor.server.model.entities.Tutor;
+import com.admin4tutor.server.service.TutorService;
 
 
 
 @RestController
 public class TutorController{
+
+    private final TutorService tutorService;
+
+    public TutorController(TutorService databaseService){
+        this.tutorService = databaseService;
+    }
     
     @PostMapping("/tutors")
-    public String displayStartPage(@RequestBody String tutor) {
-        System.out.println(tutor);
-        return null;
+    public ResponseEntity<String> getTutor(@RequestBody Tutor tutor) {
+        tutorService.addTutor(tutor.getTelegramId(), tutor);
+        return new ResponseEntity<>("Tutor received, awaiting availabilities.", 
+        HttpStatus.ACCEPTED);
+    }
+    
+    @PostMapping("/availabilities")
+    public ResponseEntity<String> getAvailabilities(@RequestParam Long telegramId,
+    @RequestBody List<Availability> availabilities){
+        tutorService.saveAvailabilities(telegramId, availabilities);
+        return new ResponseEntity<>("Tutor has been successfully saved to the database", 
+        HttpStatus.CREATED);
     }
     
 }

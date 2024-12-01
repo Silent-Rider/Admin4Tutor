@@ -1,11 +1,11 @@
 package com.admin4tutor.server.model.entities;
 
-import java.sql.Date;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 import com.admin4tutor.server.model.Language;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -29,7 +29,8 @@ public class Student {
     private String name;
 
     @Column(name = "date_of_birth", nullable = false)
-    private Date dateOfBirth;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy")
+    private LocalDate dateOfBirth;
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "VARCHAR(15)", nullable = false)
@@ -42,7 +43,7 @@ public class Student {
     private String phoneNumber;
 
     @Column(name = "created_at", nullable = false)
-    private Timestamp createdAt = Timestamp.valueOf(LocalDateTime.now());
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
     private List <Lesson> lessons;

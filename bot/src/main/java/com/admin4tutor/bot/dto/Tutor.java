@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,6 +18,7 @@ public class Tutor extends User {
     @Getter @Setter
     private Integer price;
     
+    @JsonIgnore
     @Getter
     private final Map<DayOfWeek, List<String>> availability;
 

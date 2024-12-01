@@ -1,6 +1,8 @@
 package com.admin4tutor.server.model.entities;
 
-import java.sql.Time;
+import java.time.LocalTime;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -23,10 +25,12 @@ public class Availability {
     private DayOfWeek dayOfWeek;
 
     @Column(name = "start_time", nullable = false)
-    private Time startTime;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
+    private LocalTime startTime;
 
     @Column(name = "end_time", nullable = false)
-    private Time endTime;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
+    private LocalTime endTime;
 
     private enum DayOfWeek{
         MONDAY,
