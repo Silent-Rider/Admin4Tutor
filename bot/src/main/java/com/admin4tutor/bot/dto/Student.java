@@ -14,8 +14,8 @@ public class Student extends User {
     @Getter @Setter
     private Long tutorId;
 
-    public Student(long chatId, long telegramId) {
-        super(chatId, telegramId);
+    public Student(long telegramId) {
+        super(telegramId);
     }
 
     @Override

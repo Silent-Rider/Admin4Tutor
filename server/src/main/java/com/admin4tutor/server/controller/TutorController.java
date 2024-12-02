@@ -1,4 +1,4 @@
-package com.admin4tutor.server.web;
+package com.admin4tutor.server.controller;
 
 import java.util.List;
 
@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.admin4tutor.server.model.Language;
 import com.admin4tutor.server.model.entities.Availability;
 import com.admin4tutor.server.model.entities.Tutor;
 import com.admin4tutor.server.service.TutorService;
@@ -24,7 +25,7 @@ public class TutorController{
         this.tutorService = databaseService;
     }
     
-    @PostMapping("/tutors")
+    @PostMapping("/tutors/post")
     public ResponseEntity<String> getTutor(@RequestBody Tutor tutor) {
         tutorService.addTutor(tutor.getTelegramId(), tutor);
         return new ResponseEntity<>("Tutor received, awaiting availabilities.", 
@@ -38,5 +39,12 @@ public class TutorController{
         return new ResponseEntity<>("Tutor has been successfully saved to the database", 
         HttpStatus.CREATED);
     }
+
+    @PostMapping("/tutors/get")
+    public ResponseEntity<List<Tutor>> sendTutors(@RequestParam Language language,
+    @RequestBody List<LessonTemplate> lessons){
+        return new ResponseEntity<>(tutorService.getTutors(lessons, language), HttpStatus.OK);
+    }
+
     
 }

@@ -8,6 +8,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 
 import com.admin4tutor.bot.client.WebClientService;
 import com.admin4tutor.bot.dto.DayOfWeek;
+import com.admin4tutor.bot.dto.Student;
 import com.admin4tutor.bot.dto.Tutor;
 import com.admin4tutor.bot.dto.User;
 
@@ -39,7 +40,6 @@ public class UserSession {
     @Getter(AccessLevel.PACKAGE) @Setter(AccessLevel.PACKAGE)
     private DayOfWeek currentDayOfWeek;
 
-    @Getter(AccessLevel.PACKAGE) @Setter(AccessLevel.PACKAGE)
     private Tutor currentTutor;
 
     UserSession(Stage stage, Long telegramId, WebClientService webClientService){
@@ -52,9 +52,21 @@ public class UserSession {
         webClientService.sendUser(user);
     }
 
+    Tutor getCurrentTutor(){
+        if(!(user instanceof Student)) throw new IllegalArgumentException();
+        return currentTutor;
+    }
+
+    void setCurrentTutor(Tutor currentTutor){
+        if(!(user instanceof Student)) throw new IllegalArgumentException();
+        this.currentTutor = currentTutor;
+    }
+
     List<Tutor> getSuitableTutors() {
-        if(suitableTutors == null) suitableTutors = webClientService.
-        getSuitableTutorsFromDatabase(555L, telegramId);
+        if(!(user instanceof Student)) throw new IllegalArgumentException();
+        Student student = (Student)user;
+        while(suitableTutors == null) suitableTutors = webClientService.
+        getSuitableTutors(student);
         return suitableTutors;
     }
 }

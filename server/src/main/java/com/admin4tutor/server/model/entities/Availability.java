@@ -1,6 +1,7 @@
 package com.admin4tutor.server.model.entities;
 
 import java.time.LocalTime;
+import java.time.DayOfWeek;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -31,14 +32,4 @@ public class Availability {
     @Column(name = "end_time", nullable = false)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
     private LocalTime endTime;
-
-    private enum DayOfWeek{
-        MONDAY,
-        TUESDAY,
-        WEDNESDAY,
-        THURSDAY,
-        FRIDAY,
-        SATURDAY,
-        SUNDAY
-    }
 }

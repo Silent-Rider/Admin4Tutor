@@ -35,8 +35,8 @@ public class Tutor extends User {
         }};
     }
 
-    public Tutor(long chatId, long telegramId) {
-        super(chatId, telegramId);
+    public Tutor(long telegramId) {
+        super(telegramId);
     }
 
     private String getPriceString(){

@@ -6,4 +6,6 @@ public class ServerPaths {
     static final String TUTORS_URI = "/tutors";
     static final String AVAILABILITIES_URI = "/availabilities";
     static final String LESSONS_URI = "/lessons";
+    static final String GET = "/get";
+    static final String POST = "/post";
 }

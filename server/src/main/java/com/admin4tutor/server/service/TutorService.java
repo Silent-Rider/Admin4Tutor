@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.admin4tutor.server.controller.LessonTemplate;
+import com.admin4tutor.server.model.Language;
 import com.admin4tutor.server.model.entities.Availability;
 import com.admin4tutor.server.model.entities.Tutor;
 import com.admin4tutor.server.service.repositories.AvailabilityRepository;
@@ -34,6 +36,29 @@ public class TutorService {
         availabilities.forEach(x -> x.setTutor(tutor));
         availabilityRepository.saveAll(availabilities);
         return pendingTutors.remove(telegramId);
+    }
+
+    public List<Tutor> getTutors(List<LessonTemplate> lessons, Language language){
+        List<Tutor> tutors = tutorRepository.findByLanguage(language);
+        if(tutors.isEmpty()) return tutors;
+        tutorLoop: for(int i = 0; i < tutors.size(); i++){
+            Tutor tutor = tutors.get(i);
+            for(LessonTemplate lesson: lessons){
+                if(!isTutorAvailableForLesson(tutor, lesson)){
+                    tutors.remove(tutor);
+                    continue tutorLoop;
+                }
+            }
+        }
+        return tutors;
+    }
+
+    private boolean isTutorAvailableForLesson(Tutor tutor, LessonTemplate lesson) {
+        return tutor.getAvailabilities().stream().anyMatch(availability ->
+            availability.getDayOfWeek().equals(lesson.getDayOfWeek()) &&
+            !availability.getStartTime().isAfter(lesson.getStartTime()) &&
+            !availability.getEndTime().isBefore(lesson.getStartTime())
+        );
     }
 
 }

@@ -9,7 +9,6 @@ import lombok.Data;
 @Data
 public abstract class User {
 
-    private Long chatId;
     private Long telegramId;
     private String name;
     private Language language;
@@ -17,8 +16,7 @@ public abstract class User {
     private String phoneNumber;
     private String dateOfBirth;
     
-    protected User(long chatId, long telegramId){
-        this.chatId = chatId;
+    protected User(long telegramId){
         this.telegramId = telegramId;
     }
 

@@ -28,12 +28,12 @@ public class AnswerProcessor {
     void processRoleAnswer(long chatId, String answer, UserSession session){
         switch (answer) {
             case "🧑🏼‍🎓 Я студент" -> {
-                session.setUser(new Student(chatId, session.getTelegramId()));
+                session.setUser(new Student(session.getTelegramId()));
                 session.setStage(Stage.ASKING_FOR_LANGUAGE);
                 questionHandler.askForLanguage(chatId, session.getUser());
             }
             case "🧑🏻‍🏫 Я репетитор" -> {
-                session.setUser(new Tutor(chatId, session.getTelegramId()));
+                session.setUser(new Tutor(session.getTelegramId()));
                 session.setStage(Stage.ASKING_FOR_LANGUAGE);
                 questionHandler.askForLanguage(chatId, session.getUser());
             }

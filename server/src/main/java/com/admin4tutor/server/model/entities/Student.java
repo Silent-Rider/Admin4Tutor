@@ -21,9 +21,6 @@ public class Student {
     
     @Column(name = "telegram_id", unique = true, nullable = false)
     private Long telegramId;
-    
-    @Column(name = "chat_id", unique = true, nullable = false)
-    private Long chatId;
 
     @Column(nullable = false)
     private String name;
