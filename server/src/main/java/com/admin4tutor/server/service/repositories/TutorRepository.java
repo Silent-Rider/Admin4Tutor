@@ -15,4 +15,7 @@ public interface TutorRepository extends JpaRepository <Tutor, Long> {
     
     @Query("SELECT t FROM Tutor t JOIN FETCH t.availabilities WHERE t.language = :language")
     List<Tutor> findByLanguageWithAvailabilities(@Param("language") Language language);
+
+    @Query("SELECT t FROM Tutor t JOIN FETCH t.availabilities WHERE t.telegramId = :telegram_id")
+    Tutor findByTelegramIdWithAvailabilities(@Param("telegram_id") Long telegramId);
 }

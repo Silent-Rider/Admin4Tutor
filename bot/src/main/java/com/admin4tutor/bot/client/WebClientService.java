@@ -50,6 +50,7 @@ public class WebClientService {
                 .path(ServerPaths.TUTORS_URI)
                 .path(ServerPaths.GET)
                 .queryParam("language", student.getLanguage().toString())
+                .queryParam("telegramId", student.getTelegramId())
                 .build(); })
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(lessons)
