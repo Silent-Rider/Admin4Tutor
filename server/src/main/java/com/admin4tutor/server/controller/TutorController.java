@@ -44,7 +44,7 @@ public class TutorController{
     public ResponseEntity<List<Tutor>> sendTutors(@RequestParam Language language, 
     @RequestParam Long telegramId, @RequestBody List<LessonTemplate> lessons){
         List<Tutor> tutors = tutorService.getTutors(lessons, language);
-        LessonTemplate.schedules.put(telegramId, lessons);
+        LessonTemplate.SCHEDULES.put(telegramId, lessons);
         return new ResponseEntity<>(tutors, HttpStatus.OK);
     }    
 }

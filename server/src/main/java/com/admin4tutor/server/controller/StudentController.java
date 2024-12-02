@@ -23,9 +23,9 @@ public class StudentController {
     public ResponseEntity<String> getStudent(@RequestParam Long tutorTelegramId,
     @RequestBody Student student) {
         Long telegramId = student.getTelegramId();
-        if(!LessonTemplate.schedules.containsKey(telegramId)) 
+        if(!LessonTemplate.SCHEDULES.containsKey(telegramId)) 
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        studentService.addStudent(tutorTelegramId, student, LessonTemplate.schedules.get(telegramId));
+        studentService.addStudent(tutorTelegramId, student, LessonTemplate.SCHEDULES.get(telegramId));
         return new ResponseEntity<>("Student has been successfully saved to the database", 
         HttpStatus.CREATED);
     }
