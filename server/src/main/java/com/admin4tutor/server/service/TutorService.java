@@ -1,5 +1,6 @@
 package com.admin4tutor.server.service;
 
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -39,7 +40,7 @@ public class TutorService {
     }
 
     public List<Tutor> getTutors(List<LessonTemplate> lessons, Language language){
-        List<Tutor> tutors = tutorRepository.findByLanguage(language);
+        List<Tutor> tutors = tutorRepository.findByLanguageWithAvailabilities(language);
         if(tutors.isEmpty()) return tutors;
         tutorLoop: for(int i = 0; i < tutors.size(); i++){
             Tutor tutor = tutors.get(i);
@@ -54,11 +55,14 @@ public class TutorService {
     }
 
     private boolean isTutorAvailableForLesson(Tutor tutor, LessonTemplate lesson) {
+        LocalTime endTime = lesson.getStartTime().plusHours(1);
         return tutor.getAvailabilities().stream().anyMatch(availability ->
-            availability.getDayOfWeek().equals(lesson.getDayOfWeek()) &&
-            !availability.getStartTime().isAfter(lesson.getStartTime()) &&
-            !availability.getEndTime().isBefore(lesson.getStartTime())
-        );
+        availability.getDayOfWeek().equals(lesson.getDayOfWeek()) &&
+        !lesson.getStartTime().isBefore(availability.getStartTime()) &&
+        !lesson.getStartTime().isAfter(availability.getEndTime()) &&
+        !endTime.isBefore(availability.getStartTime()) &&
+        !endTime.isAfter(availability.getEndTime())
+    );
     }
 
 }

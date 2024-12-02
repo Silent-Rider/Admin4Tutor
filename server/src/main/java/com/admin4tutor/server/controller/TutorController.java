@@ -28,7 +28,7 @@ public class TutorController{
     @PostMapping("/tutors/post")
     public ResponseEntity<String> getTutor(@RequestBody Tutor tutor) {
         tutorService.addTutor(tutor.getTelegramId(), tutor);
-        return new ResponseEntity<>("Tutor received, awaiting availabilities.", 
+        return new ResponseEntity<>("Tutor received, waiting for availabilities.", 
         HttpStatus.ACCEPTED);
     }
     
@@ -43,8 +43,7 @@ public class TutorController{
     @PostMapping("/tutors/get")
     public ResponseEntity<List<Tutor>> sendTutors(@RequestParam Language language,
     @RequestBody List<LessonTemplate> lessons){
-        return new ResponseEntity<>(tutorService.getTutors(lessons, language), HttpStatus.OK);
-    }
-
-    
+        List<Tutor> tutors = tutorService.getTutors(lessons, language);
+        return new ResponseEntity<>(tutors, HttpStatus.OK);
+    }    
 }

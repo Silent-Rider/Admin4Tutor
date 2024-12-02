@@ -8,5 +8,5 @@ public enum Language {
     ITALIAN,
     CHINESE,
     JAPANESE,
-    KOREAN;
+    KOREAN
 }

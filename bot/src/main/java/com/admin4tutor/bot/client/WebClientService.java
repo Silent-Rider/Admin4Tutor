@@ -49,7 +49,7 @@ public class WebClientService {
                 return uriBuilder
                 .path(ServerPaths.TUTORS_URI)
                 .path(ServerPaths.GET)
-                .queryParam("language", student.getLanguage())
+                .queryParam("language", student.getLanguage().toString())
                 .build(); })
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(lessons)

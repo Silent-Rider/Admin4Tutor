@@ -239,7 +239,7 @@ public class QuestionHandler {
             keyboard.add(Collections.singletonList(button));
         });
         keyboardMarkup.setKeyboard(keyboard);
-        String text = "Выберите подходящего по вашему расписанию репетитора из списка";
+        String text = "Выберите одного репетитора из списка подходящих по вашему расписанию";
         bot.sendMessage(chatId, text, keyboardMarkup);
     }
 
