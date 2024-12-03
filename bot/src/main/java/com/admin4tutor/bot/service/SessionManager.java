@@ -45,7 +45,7 @@ public class SessionManager {
             case Stage.CHECKING_QUESTIONNAIRE_RESULTS -> answerProcessor.processChekingQuestionnaireAnswer(chatId, answer, session);
             case Stage.ASKING_FOR_TUTOR -> answerProcessor.processTutorAnswer(chatId, answer, session);
             case Stage.VIEWING_TUTOR_PAGE -> answerProcessor.processTutorView(chatId, answer, session);
-            case Stage.WAITING_FOR_TUTOR_CONFIRMATION -> answerProcessor.processEager(chatId, session);
+            case Stage.WAITING_FOR_TUTOR_CONFIRMATION -> answerProcessor.processEager(chatId);
             case Stage.CONFIRMING_REGISTRATION -> answerProcessor.processConfirmation(chatId, answer, session);
             case Stage.NOTIFYING_REGISTRATION_RESULTS -> answerProcessor.processRegistrationResults(chatId, answer, session);
             case Stage.MAIN_MENU -> System.out.println();   

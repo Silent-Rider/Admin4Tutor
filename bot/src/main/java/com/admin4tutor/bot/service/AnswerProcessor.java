@@ -14,6 +14,9 @@ import com.admin4tutor.bot.dto.Student;
 import com.admin4tutor.bot.dto.Tutor;
 import com.admin4tutor.bot.dto.User;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class AnswerProcessor {
     
@@ -317,8 +320,9 @@ public class AnswerProcessor {
             case "Записаться" -> {
                 Tutor chosenTutor = session.getCurrentTutor();
                 student.setTutorId(chosenTutor.getTelegramId());
-                questionHandler.askTutorForConfirmation(chosenTutor, student);
                 session.setStage(Stage.WAITING_FOR_TUTOR_CONFIRMATION);
+                processEager(chatId);
+                questionHandler.askTutorForConfirmation(chosenTutor, student);
             }
             case "Вернуться к списку" -> {
                 session.setStage(Stage.ASKING_FOR_TUTOR);
@@ -330,9 +334,9 @@ public class AnswerProcessor {
         }
     }
 
-    void processEager(long chatId, UserSession session){
+    void processEager(long chatId){
         bot.sendMessage(chatId, "Как только репетитор подтвердит запись, вам придет оповещение", 
-        session.getCurrentKeyboard());
+         null);
     }
 
     void processConfirmation(long chatId, String answer, UserSession session){
@@ -354,22 +358,12 @@ public class AnswerProcessor {
     }
 
     void processRegistrationResults(long chatId, String answer, UserSession session){
-        if(session.getUser() instanceof Tutor){
-            if(answer.equals("Главное меню")){
-                session.setStage(Stage.MAIN_MENU);
-                questionHandler.launchMainMenu(chatId, session);
-            }
-        } else if(session.getUser() instanceof Student){
-            switch(answer){
-                case "Главное меню" -> {
-                    session.setStage(Stage.MAIN_MENU);
-                    questionHandler.launchMainMenu(chatId, session);
-                }
-                case "К списку репетиторов" -> {
-                    session.setStage(Stage.ASKING_FOR_TUTOR);
-                    questionHandler.askForTutor(chatId, session);
-                }
-            }
+        if(answer.equals("К списку репетиторов")){
+            session.setStage(Stage.ASKING_FOR_TUTOR);
+            questionHandler.askForTutor(chatId, session);
+        } else if(answer.equals("Главное меню")){
+            session.setStage(Stage.MAIN_MENU);
+            questionHandler.launchMainMenu(chatId, session);
         }
     }
 }

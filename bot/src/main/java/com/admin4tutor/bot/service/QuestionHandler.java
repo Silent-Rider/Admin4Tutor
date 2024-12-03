@@ -232,7 +232,6 @@ public class QuestionHandler {
     }
 
     void askForTutor(long chatId, UserSession session){
-        InlineKeyboardMarkup keyboardMarkup = new InlineKeyboardMarkup();
         List<Tutor> tutors = session.getSuitableTutors();
         if(tutors.isEmpty()){
             ReplyKeyboardMarkup simpleKeyboardMarkup = new ReplyKeyboardMarkup();
@@ -243,6 +242,7 @@ public class QuestionHandler {
             "подходящих по вашему расписанию репетиторов нет", simpleKeyboardMarkup);
             return;
         }
+        InlineKeyboardMarkup keyboardMarkup = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
         tutors.forEach(x -> {
             InlineKeyboardButton button = new InlineKeyboardButton(x.getName());
