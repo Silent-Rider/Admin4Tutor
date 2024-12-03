@@ -20,7 +20,7 @@ public class AnswerProcessor {
     private final TelegramBot bot;
     private final QuestionHandler questionHandler;
 
-    public AnswerProcessor(@Lazy TelegramBot bot, QuestionHandler questionHandler){
+    public AnswerProcessor(@Lazy TelegramBot bot, @Lazy QuestionHandler questionHandler){
         this.bot = bot;
         this.questionHandler = questionHandler;
     }
@@ -275,8 +275,9 @@ public class AnswerProcessor {
             questionHandler.askForLanguage(chatId, user);
         } else if(answer.equals("Готово")){
             if(user instanceof Tutor){
-                session.setStage(Stage.SENDING_USER_TO_SERVER);
+                session.setStage(Stage.NOTIFYING_REGISTRATION_RESULTS);
                 session.sendUser();
+                questionHandler.notifyTutorAboutRegistration(chatId);
             } else{
                 session.setStage(Stage.ASKING_FOR_TUTOR);
                 questionHandler.askForTutor(chatId, session);
@@ -314,16 +315,61 @@ public class AnswerProcessor {
         Student student = (Student) session.getUser();
         switch (answer) {
             case "Записаться" -> {
-                student.setTutorId(session.getCurrentTutor().getTelegramId());
-                session.setStage(Stage.SENDING_USER_TO_SERVER);
-                session.sendUser();
+                Tutor chosenTutor = session.getCurrentTutor();
+                student.setTutorId(chosenTutor.getTelegramId());
+                questionHandler.askTutorForConfirmation(chosenTutor, student);
+                session.setStage(Stage.WAITING_FOR_TUTOR_CONFIRMATION);
             }
             case "Вернуться к списку" -> {
                 session.setStage(Stage.ASKING_FOR_TUTOR);
                 questionHandler.askForTutor(chatId, session);
             }
             default -> bot.sendMessage(chatId,
-                        "Пожалуйста, выберите один из предложенных вариантов", session.getCurrentKeyboard());
+                    "Пожалуйста, выберите один из предложенных вариантов", 
+                    session.getCurrentKeyboard());
+        }
+    }
+
+    void processEager(long chatId, UserSession session){
+        bot.sendMessage(chatId, "Как только репетитор подтвердит запись, вам придет оповещение", 
+        session.getCurrentKeyboard());
+    }
+
+    void processConfirmation(long chatId, String answer, UserSession session){
+        String [] whole = answer.split("/");
+        Long studentId = Long.valueOf(whole[1]);
+        String choice = whole[0];
+        switch(choice){
+            case "Подтвердить запись" -> questionHandler.notifyStudentAboutConfirmation(studentId);
+            case "Отклонить запись" -> questionHandler.notifyStudentAboutRejection(studentId);
+            default -> {
+                bot.sendMessage(chatId,
+                    "Пожалуйста, выберите один из предложенных вариантов", 
+                    session.getCurrentKeyboard());
+                    return;
+            }
+        }
+        session.setStage(Stage.MAIN_MENU);
+        questionHandler.launchMainMenu(chatId, session);
+    }
+
+    void processRegistrationResults(long chatId, String answer, UserSession session){
+        if(session.getUser() instanceof Tutor){
+            if(answer.equals("Главное меню")){
+                session.setStage(Stage.MAIN_MENU);
+                questionHandler.launchMainMenu(chatId, session);
+            }
+        } else if(session.getUser() instanceof Student){
+            switch(answer){
+                case "Главное меню" -> {
+                    session.setStage(Stage.MAIN_MENU);
+                    questionHandler.launchMainMenu(chatId, session);
+                }
+                case "К списку репетиторов" -> {
+                    session.setStage(Stage.ASKING_FOR_TUTOR);
+                    questionHandler.askForTutor(chatId, session);
+                }
+            }
         }
     }
 }

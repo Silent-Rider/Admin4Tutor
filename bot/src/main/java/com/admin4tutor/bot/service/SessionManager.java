@@ -6,6 +6,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import com.admin4tutor.bot.dto.Tutor;
+
 @Service
 public class SessionManager {
 
@@ -43,11 +45,25 @@ public class SessionManager {
             case Stage.CHECKING_QUESTIONNAIRE_RESULTS -> answerProcessor.processChekingQuestionnaireAnswer(chatId, answer, session);
             case Stage.ASKING_FOR_TUTOR -> answerProcessor.processTutorAnswer(chatId, answer, session);
             case Stage.VIEWING_TUTOR_PAGE -> answerProcessor.processTutorView(chatId, answer, session);
-            case Stage.SENDING_USER_TO_SERVER -> System.out.println();   
+            case Stage.WAITING_FOR_TUTOR_CONFIRMATION -> answerProcessor.processEager(chatId, session);
+            case Stage.CONFIRMING_REGISTRATION -> answerProcessor.processConfirmation(chatId, answer, session);
+            case Stage.NOTIFYING_REGISTRATION_RESULTS -> answerProcessor.processRegistrationResults(chatId, answer, session);
+            case Stage.MAIN_MENU -> System.out.println();   
         }
+    }
+
+    public void startSessionForTutorConfirmation(Tutor tutor){
+        Long telegramId = tutor.getTelegramId();
+        UserSession session = userSessionFactory.createUserSession(Stage.CONFIRMING_REGISTRATION, telegramId);
+        session.setUser(tutor);
+        userSessions.put(telegramId, session);
     }
 
     public UserSession getUserSession(long chatId){
         return userSessions.get(chatId);
+    }
+
+    public boolean containsUserSession(long chatId){
+        return userSessions.containsKey(chatId);
     }
 }

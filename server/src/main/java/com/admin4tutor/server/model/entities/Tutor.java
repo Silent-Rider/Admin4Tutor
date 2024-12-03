@@ -60,6 +60,6 @@ public class Tutor {
     private List <Availability> availabilities;
 
     @JsonIgnore
-    @OneToMany(mappedBy="tutor", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "tutor", cascade = CascadeType.ALL)
     private List<Student> students;
 }

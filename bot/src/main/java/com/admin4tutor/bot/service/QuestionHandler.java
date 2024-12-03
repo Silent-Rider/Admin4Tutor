@@ -26,9 +26,11 @@ import lombok.extern.slf4j.Slf4j;
 public class QuestionHandler {
     
     private final TelegramBot bot;
+    private final SessionManager sessionManager;
 
-    public QuestionHandler(TelegramBot bot){
+    public QuestionHandler(TelegramBot bot, SessionManager sessionManager){
         this.bot = bot;
+        this.sessionManager = sessionManager;
     }
 
     void askForLanguage(long chatId, User user){
@@ -128,7 +130,8 @@ public class QuestionHandler {
             if((i+1) % 2 == 0) j++;
         }
         keyboardMarkup.setKeyboard(keyboard);
-        String text = "Выберите желаемый день недели для проведения занятия";
+        String text = "Составьте удобное для вас расписание. " + 
+        "Выберите желаемый день недели для проведения занятия";
         bot.sendMessage(chatId, text, keyboardMarkup);
     }
 
@@ -173,8 +176,7 @@ public class QuestionHandler {
         ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
         keyboardMarkup.setResizeKeyboard(true);
         keyboardMarkup.setOneTimeKeyboard(true);
-        KeyboardButton skip = new KeyboardButton("Пропустить");
-        KeyboardRow row = new KeyboardRow(){{add(skip);}};
+        KeyboardRow row = new KeyboardRow(Collections.singletonList(new KeyboardButton("Пропустить")));
         List <KeyboardRow> keyboard = Collections.singletonList(row);
         keyboardMarkup.setKeyboard(keyboard);
         bot.sendMessage(chatId, "Напишите ваш адрес электронной почты ✉️", keyboardMarkup);
@@ -184,8 +186,7 @@ public class QuestionHandler {
         ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
         keyboardMarkup.setResizeKeyboard(true);
         keyboardMarkup.setOneTimeKeyboard(true);
-        KeyboardButton skip = new KeyboardButton("Пропустить");
-        KeyboardRow row = new KeyboardRow(){{add(skip);}};
+        KeyboardRow row = new KeyboardRow(Collections.singletonList(new KeyboardButton("Пропустить")));
         List <KeyboardRow> keyboard = Collections.singletonList(row);
         keyboardMarkup.setKeyboard(keyboard);
         bot.sendMessage(chatId, "Напишите ваш номер телефона 📞", keyboardMarkup);
@@ -218,6 +219,16 @@ public class QuestionHandler {
                 log.error("Lost type of user");
             }
         }
+    }
+
+    void notifyTutorAboutRegistration(long tutorId){
+        InlineKeyboardMarkup keyboardMarkup = new InlineKeyboardMarkup();
+        InlineKeyboardButton mainMenu = new InlineKeyboardButton("Главное меню");
+        mainMenu.setCallbackData("Главное меню");
+        List<List<InlineKeyboardButton>> keyboard = new ArrayList<>(Collections.singletonList(
+            Collections.singletonList(mainMenu)));
+        keyboardMarkup.setKeyboard(keyboard);
+        bot.sendMessage(tutorId, "Вы успешно зарегистрированы как репетитор", keyboardMarkup);
     }
 
     void askForTutor(long chatId, UserSession session){
@@ -254,4 +265,55 @@ public class QuestionHandler {
         keyboardMarkup.setKeyboard(keyboard);
         bot.sendMessage(chatId, tutor.toString(), keyboardMarkup);
     }
+
+    void askTutorForConfirmation(Tutor chosenTutor, Student student){
+        Long tutorTelegramId = chosenTutor.getTelegramId();
+        InlineKeyboardMarkup keyboardMarkup = new InlineKeyboardMarkup();
+        String confirmText = "Подтвердить запись";
+        String rejectText = "Отклонить запись";
+        InlineKeyboardButton confirm = new InlineKeyboardButton(confirmText);
+        InlineKeyboardButton reject = new InlineKeyboardButton(rejectText);
+        confirm.setCallbackData(confirmText + "/" + student.getTelegramId());
+        reject.setCallbackData(rejectText + "/" + student.getTelegramId());
+        List<List<InlineKeyboardButton>> keyboard = Collections.singletonList(List.of(confirm, reject));
+        keyboardMarkup.setKeyboard(keyboard);
+        if(sessionManager.containsUserSession(tutorTelegramId)){
+            UserSession tutorSession = sessionManager.getUserSession(tutorTelegramId);
+            tutorSession.setStage(Stage.CONFIRMING_REGISTRATION);
+        } else sessionManager.startSessionForTutorConfirmation(chosenTutor);
+        String text = "К вам на занятия хочет записаться студент. Подтвердите или отклоните запись\n" 
+        + student.toString();
+        bot.sendMessage(tutorTelegramId, text , keyboardMarkup);
+    }
+
+    void notifyStudentAboutConfirmation(long studentId){
+        InlineKeyboardMarkup keyboardMarkup = new InlineKeyboardMarkup();
+        InlineKeyboardButton mainMenu = new InlineKeyboardButton("Главное меню");
+        mainMenu.setCallbackData("Главное меню");
+        List<List<InlineKeyboardButton>> keyboard = new ArrayList<>(Collections.singletonList(
+            Collections.singletonList(mainMenu)));
+        keyboardMarkup.setKeyboard(keyboard);
+        UserSession session = sessionManager.getUserSession(studentId);
+        session.setStage(Stage.NOTIFYING_REGISTRATION_RESULTS);
+        session.sendUser();
+        bot.sendMessage(studentId, "Репетитор подтвердил вашу запись. " + 
+        "Вы успешно зарегистрированы", keyboardMarkup);
+    }
+
+    void notifyStudentAboutRejection(long studentId){
+        InlineKeyboardMarkup keyboardMarkup = new InlineKeyboardMarkup();
+        InlineKeyboardButton mainMenu = new InlineKeyboardButton("К списку репетиторов");
+        mainMenu.setCallbackData("К списку репетиторов");
+        List<List<InlineKeyboardButton>> keyboard = new ArrayList<>(Collections.singletonList(
+            Collections.singletonList(mainMenu)));
+        keyboardMarkup.setKeyboard(keyboard);
+        UserSession session = sessionManager.getUserSession(studentId);
+        session.setStage(Stage.NOTIFYING_REGISTRATION_RESULTS);
+        bot.sendMessage(studentId, "К сожалению, репетитор не подтвердил вашу запись", keyboardMarkup);
+    }
+
+    void launchMainMenu(long chatId, UserSession session){
+        
+    }
+
 }

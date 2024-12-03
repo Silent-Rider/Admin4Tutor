@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.admin4tutor.server.model.Language;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -15,6 +16,7 @@ import lombok.Data;
 @Table(name = "students")
 public class Student {
     
+    @JsonIgnore
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -39,12 +41,15 @@ public class Student {
     @Column(name = "phone_number", unique = true)
     private String phoneNumber;
 
+    @JsonIgnore
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
     private List <Lesson> lessons;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "tutor_id", nullable = false)
     private Tutor tutor;
