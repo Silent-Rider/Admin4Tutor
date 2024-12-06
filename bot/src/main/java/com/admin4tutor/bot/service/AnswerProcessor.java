@@ -17,7 +17,7 @@ import com.admin4tutor.bot.dto.Tutor;
 import com.admin4tutor.bot.dto.User;
 
 import lombok.extern.slf4j.Slf4j;
-
+//реализовать логику очищения мапы доступности репетитора в случае перезаполнения
 @Slf4j
 @Service
 public class AnswerProcessor {
@@ -187,6 +187,8 @@ public class AnswerProcessor {
     }
 
     void processScheduleDayAnswer(long chatId, String answer, UserSession session){
+        Student student = (Student)session.getUser();
+        student.getSchedule().clear();
         switch(answer) {
             case "MONDAY" -> session.setCurrentDayOfWeek(DayOfWeek.MONDAY);
             case "TUESDAY" -> session.setCurrentDayOfWeek(DayOfWeek.TUESDAY);
@@ -292,6 +294,14 @@ public class AnswerProcessor {
         User user = session.getUser();
         if(answer.equals("Заполнить анкету заново")){
             session.setStage(Stage.ASKING_FOR_LANGUAGE);
+            switch(user){
+                case Tutor tutor -> session.setUser(new Tutor(tutor.getTelegramId()));
+                case Student student -> session.setUser(new Student(student.getTelegramId()));
+                default -> {
+                    log.error("Lost type of user");
+                    return;
+                }
+            }
             questionHandler.askForLanguage(chatId, user);
         } else if(answer.equals("Готово")){
             if(user instanceof Tutor){

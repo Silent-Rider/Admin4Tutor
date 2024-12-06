@@ -4,8 +4,7 @@ public class ServerEndpoints {
     
     static final String STUDENTS_URI = "/students";
     static final String TUTORS_URI = "/tutors";
-    static final String AVAILABILITIES_URI = "/availabilities";
-    static final String LESSONS_URI = "/lessons";
-    static final String GET = "/get";
-    static final String POST = "/post";
+    static final String AVAILABILITIES = "/availabilities";
+    static final String SEARCH = "/search";
+    static final String ENROLL = "/enroll";
 }

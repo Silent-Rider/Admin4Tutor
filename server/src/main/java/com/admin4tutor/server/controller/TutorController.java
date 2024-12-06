@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -15,7 +16,7 @@ import com.admin4tutor.server.model.entities.Tutor;
 import com.admin4tutor.server.service.TutorService;
 
 
-
+@RequestMapping("/tutors")
 @RestController
 public class TutorController{
 
@@ -25,23 +26,23 @@ public class TutorController{
         this.tutorService = databaseService;
     }
     
-    @PostMapping("/tutors/post")
-    public ResponseEntity<String> getTutor(@RequestBody Tutor tutor) {
+    @PostMapping
+    public ResponseEntity<String> createTutor(@RequestBody Tutor tutor) {
         tutorService.addTutor(tutor.getTelegramId(), tutor);
         return new ResponseEntity<>("Tutor received, waiting for availabilities.", 
         HttpStatus.ACCEPTED);
     }
     
     @PostMapping("/availabilities")
-    public ResponseEntity<String> getAvailabilities(@RequestParam Long telegramId,
+    public ResponseEntity<String> addAvailabilities(@RequestParam Long telegramId,
     @RequestBody List<Availability> availabilities){
         tutorService.saveAvailabilities(telegramId, availabilities);
         return new ResponseEntity<>("Tutor has been successfully saved to the database", 
         HttpStatus.CREATED);
     }
 
-    @PostMapping("/tutors/get")
-    public ResponseEntity<List<Tutor>> sendTutors(@RequestParam Language language, 
+    @PostMapping("/search")
+    public ResponseEntity<List<Tutor>> getSuitableTutors(@RequestParam Language language, 
     @RequestParam Long telegramId, @RequestBody List<LessonTemplate> lessons){
         List<Tutor> tutors = tutorService.getAvailableTutorsByLanguage(lessons, language);
         LessonTemplate.SCHEDULES.put(telegramId, lessons);

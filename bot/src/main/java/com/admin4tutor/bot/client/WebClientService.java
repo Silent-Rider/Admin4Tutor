@@ -48,7 +48,7 @@ public class WebClientService {
             .uri( uriBuilder -> {
                 return uriBuilder
                 .path(ServerEndpoints.TUTORS_URI)
-                .path(ServerEndpoints.GET)
+                .path(ServerEndpoints.SEARCH)
                 .queryParam("language", student.getLanguage().toString())
                 .queryParam("telegramId", student.getTelegramId())
                 .build(); })
@@ -69,7 +69,7 @@ public class WebClientService {
     private void sendTutor(Tutor tutor){ 
         try {
             webClient.post()
-            .uri(ServerEndpoints.TUTORS_URI + ServerEndpoints.POST)
+            .uri(ServerEndpoints.TUTORS_URI)
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(tutor)
             .retrieve()
@@ -86,7 +86,8 @@ public class WebClientService {
             webClient.post()
             .uri(uriBuilder -> {
                 return uriBuilder
-                .path(ServerEndpoints.AVAILABILITIES_URI)
+                .path(ServerEndpoints.TUTORS_URI)
+                .path(ServerEndpoints.AVAILABILITIES)
                 .queryParam("telegramId", telegramId)
                 .build(); })
             .contentType(MediaType.APPLICATION_JSON)
@@ -106,6 +107,7 @@ public class WebClientService {
             .uri(uriBuilder -> {
                 return uriBuilder
                 .path(ServerEndpoints.STUDENTS_URI)
+                .path(ServerEndpoints.ENROLL)
                 .queryParam("tutorTelegramId", student.getTutorId())
                 .build();
             })
@@ -119,6 +121,4 @@ public class WebClientService {
             log.error("Error while sending student data: " + e.getMessage());
         }
     }
-
-
 }
