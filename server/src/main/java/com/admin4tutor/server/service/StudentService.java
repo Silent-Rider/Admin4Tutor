@@ -4,14 +4,14 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.admin4tutor.server.controller.LessonTemplate;
+import com.admin4tutor.server.model.entities.Lesson;
 import com.admin4tutor.server.model.entities.Student;
 import com.admin4tutor.server.model.entities.Tutor;
 import com.admin4tutor.server.service.repositories.LessonRepository;
 import com.admin4tutor.server.service.repositories.StudentRepository;
-import com.admin4tutor.server.service.repositories.TutorRepository;
 
 @Service
 public class StudentService {
@@ -20,12 +20,16 @@ public class StudentService {
     private StudentRepository studentRepository;
     @Autowired
     private LessonRepository lessonRepository;
-    @Autowired
-    private TutorRepository tutorRepository;
     
-    @Transactional
-    public void addStudent(Long tutorTelegramId, Student student, List<LessonTemplate> schedule){
-        Tutor tutor = tutorRepository.findByTelegramIdWithAvailabilities(tutorTelegramId);
-        
+    @Transactional(propagation = Propagation.MANDATORY)
+    void addStudent(Student student, List<Lesson> lessons, Tutor tutor){
+        student.setTutor(tutor);
+        studentRepository.save(student);
+        lessons.forEach(lesson -> {
+            lesson.setTutor(tutor);
+            lesson.setStudent(student);
+            lesson.setLanguage(tutor.getLanguage());
+        });
+        lessonRepository.saveAll(lessons);
     }
 }

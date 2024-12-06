@@ -43,7 +43,7 @@ public class TutorController{
     @PostMapping("/tutors/get")
     public ResponseEntity<List<Tutor>> sendTutors(@RequestParam Language language, 
     @RequestParam Long telegramId, @RequestBody List<LessonTemplate> lessons){
-        List<Tutor> tutors = tutorService.getTutors(lessons, language);
+        List<Tutor> tutors = tutorService.getAvailableTutorsByLanguage(lessons, language);
         LessonTemplate.SCHEDULES.put(telegramId, lessons);
         return new ResponseEntity<>(tutors, HttpStatus.OK);
     }    

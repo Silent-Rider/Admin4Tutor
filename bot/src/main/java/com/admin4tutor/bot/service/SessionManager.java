@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import com.admin4tutor.bot.client.WebClientService;
 import com.admin4tutor.bot.dto.Tutor;
 
 @Service
@@ -13,15 +14,15 @@ public class SessionManager {
 
     private final Map <Long, UserSession> userSessions = new ConcurrentHashMap<>();
     private final AnswerProcessor answerProcessor;
-    private final UserSessionFactory userSessionFactory;
+    private final WebClientService webClientService;
 
-    public SessionManager (@Lazy AnswerProcessor answerProcessor, UserSessionFactory userSessionFactory){
+    public SessionManager (@Lazy AnswerProcessor answerProcessor, WebClientService webClientService){
         this.answerProcessor = answerProcessor;
-        this.userSessionFactory = userSessionFactory;
+        this.webClientService = webClientService;
     }
 
     public void startSession(long chatId, long telegramId){
-        UserSession session = userSessionFactory.createUserSession(Stage.ASKING_FOR_ROLE, telegramId);
+        UserSession session = new UserSession(Stage.ASKING_FOR_ROLE, telegramId, webClientService);
         userSessions.put(chatId, session);
     }
 
@@ -54,7 +55,7 @@ public class SessionManager {
 
     public void startSessionForTutorConfirmation(Tutor tutor){
         Long telegramId = tutor.getTelegramId();
-        UserSession session = userSessionFactory.createUserSession(Stage.CONFIRMING_REGISTRATION, telegramId);
+        UserSession session = new UserSession(Stage.CONFIRMING_REGISTRATION, telegramId, webClientService);
         session.setUser(tutor);
         userSessions.put(telegramId, session);
     }

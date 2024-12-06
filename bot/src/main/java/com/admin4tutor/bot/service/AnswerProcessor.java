@@ -1,5 +1,7 @@
 package com.admin4tutor.bot.service;
 
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -118,6 +120,21 @@ public class AnswerProcessor {
         if(answer.matches("^([0-1][0-9]|2[0-3]):[0-5][0-9]-([0-1][0-9]|2[0-3]):[0-5][0-9]" + 
         "(, ?([0-1][0-9]|2[0-3]):[0-5][0-9]-([0-1][0-9]|2[0-3]):[0-5][0-9])*$")){
             List<String> intervals = new ArrayList<>(Arrays.asList(answer.split(", ?")));
+            for(var interval: intervals){
+                String[] times = interval.split("-");
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+                LocalTime start = LocalTime.parse(times[0], formatter);
+                LocalTime end = LocalTime.parse(times[1], formatter);
+                if(!start.isBefore(end)){
+                    String text = String.format("Неверный формат интервалов%n" + 
+                    "Начальный час интервала не может быть позже конечного%n" +
+                    "%s: Укажите один или более интервалов доступности " + 
+                    "в формате \"ЧЧ:ММ-ЧЧ:ММ\", перечисляя их через запятую 🕰%n", 
+                    session.getCurrentDayOfWeek().getValue()) + "Пример: 10:45-14:00, 20:00-22:30";
+                    bot.sendMessage(chatId, text, session.getCurrentKeyboard());
+                    return;
+                }
+            }
             tutor.getAvailability().put(session.getCurrentDayOfWeek(), intervals);
         } else {
             String text = String.format("Неверный формат интервалов%n" + 

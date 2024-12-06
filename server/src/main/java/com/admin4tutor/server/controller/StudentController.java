@@ -8,15 +8,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.admin4tutor.server.model.entities.Student;
-import com.admin4tutor.server.service.StudentService;
+import com.admin4tutor.server.service.EnrollmentService;
 
 @RestController
 public class StudentController {
 
-    private final StudentService studentService;
+    private final EnrollmentService enrollmentService;
 
-    public StudentController(StudentService studentService){
-        this.studentService = studentService;
+    public StudentController(EnrollmentService studentService){
+        this.enrollmentService = studentService;
     }
     
     @PostMapping("/students")
@@ -25,7 +25,7 @@ public class StudentController {
         Long telegramId = student.getTelegramId();
         if(!LessonTemplate.SCHEDULES.containsKey(telegramId)) 
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        studentService.addStudent(tutorTelegramId, student, LessonTemplate.SCHEDULES.get(telegramId));
+        enrollmentService.enrollStudent(tutorTelegramId, student, LessonTemplate.SCHEDULES.get(telegramId));
         return new ResponseEntity<>("Student has been successfully saved to the database", 
         HttpStatus.CREATED);
     }

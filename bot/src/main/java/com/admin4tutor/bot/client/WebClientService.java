@@ -47,8 +47,8 @@ public class WebClientService {
             tutors = webClient.post()
             .uri( uriBuilder -> {
                 return uriBuilder
-                .path(ServerPaths.TUTORS_URI)
-                .path(ServerPaths.GET)
+                .path(ServerEndpoints.TUTORS_URI)
+                .path(ServerEndpoints.GET)
                 .queryParam("language", student.getLanguage().toString())
                 .queryParam("telegramId", student.getTelegramId())
                 .build(); })
@@ -69,13 +69,13 @@ public class WebClientService {
     private void sendTutor(Tutor tutor){ 
         try {
             webClient.post()
-            .uri(ServerPaths.TUTORS_URI + ServerPaths.POST)
+            .uri(ServerEndpoints.TUTORS_URI + ServerEndpoints.POST)
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(tutor)
             .retrieve()
             .toBodilessEntity()
             .block();
-            log.info("New tutor successfully send to webserver");
+            log.info("New tutor successfully sent to webserver");
         } catch (WebClientResponseException e) {
             log.error("Error while sending tutor data: " + e.getMessage());
         }
@@ -86,7 +86,7 @@ public class WebClientService {
             webClient.post()
             .uri(uriBuilder -> {
                 return uriBuilder
-                .path(ServerPaths.AVAILABILITIES_URI)
+                .path(ServerEndpoints.AVAILABILITIES_URI)
                 .queryParam("telegramId", telegramId)
                 .build(); })
             .contentType(MediaType.APPLICATION_JSON)
@@ -94,14 +94,30 @@ public class WebClientService {
             .retrieve()
             .toBodilessEntity()
             .block();
-            log.info("Tutor's availabilities successfully send to webserver");
+            log.info("Tutor's availabilities successfully sent to webserver");
         } catch (WebClientResponseException e) {
             log.error("Error while sending tutor's availabilities: " + e.getMessage());
         }
     }
 
     private void sendStudent(Student student){
-        System.out.println(student);
+        try{
+            webClient.post()
+            .uri(uriBuilder -> {
+                return uriBuilder
+                .path(ServerEndpoints.STUDENTS_URI)
+                .queryParam("tutorTelegramId", student.getTutorId())
+                .build();
+            })
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(student)
+            .retrieve()
+            .toBodilessEntity()
+            .block();
+            log.info("New student successfully sent to webserver");
+        } catch(WebClientRequestException e) {
+            log.error("Error while sending student data: " + e.getMessage());
+        }
     }
 
 
