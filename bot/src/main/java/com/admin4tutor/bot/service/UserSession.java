@@ -65,8 +65,7 @@ public class UserSession {
     List<Tutor> getSuitableTutors() {
         if(!(user instanceof Student)) throw new IllegalArgumentException();
         Student student = (Student)user;
-        while(suitableTutors == null) suitableTutors = webClientService.
-        getSuitableTutors(student);
+        suitableTutors = webClientService.getSuitableTutors(student);
         return suitableTutors;
     }
 }
