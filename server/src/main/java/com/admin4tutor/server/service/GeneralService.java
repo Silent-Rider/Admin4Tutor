@@ -27,17 +27,29 @@ public class GeneralService {
     private LessonRepository lessonRepository;
 
     @Transactional
-    public void enrollStudent(Long tutorTelegramId, Student student, List<Schedule> schedules){
+    public void enrollStudent(Long tutorTelegramId, Student student){
         Tutor tutor = tutorService.getTutorByTelegramId(tutorTelegramId);
+        List<Schedule> schedules = StudentService.SCHEDULES.get(student.getTelegramId());
         List<Lesson> lessons = createLessons(schedules);
-        studentService.addStudent(student, schedules, tutor);
-        tutorService.updateTutorAvailabilities(tutor, schedules);
+        studentService.addStudent(student, tutor);
+        tutorService.updateTutorAvailabilities(tutor, schedules, true);
         lessons.forEach(lesson -> {
             lesson.setTutor(tutor);
             lesson.setStudent(student);
             lesson.setLanguage(tutor.getLanguage());
         });
         lessonRepository.saveAll(lessons);
+    }
+
+    @Transactional
+    public void deleteStudent(Long telegramId){
+        Student student = studentService.getStudentByTelegramId(telegramId);
+        List<Schedule> schedules = student.getSchedules();
+        List<Lesson> scheduledLessons = lessonRepository.findByStudentAndStatus(student, Status.SCHEDULED);
+        studentService.deleteStudent(student);
+        Tutor tutor = student.getTutor();
+        tutorService.updateTutorAvailabilities(tutor, schedules, false);
+
     }
 
     private List<Lesson> createLessons(List<Schedule> schedules){

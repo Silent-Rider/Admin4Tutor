@@ -2,6 +2,8 @@ package com.admin4tutor.server.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,9 +19,11 @@ import com.admin4tutor.server.service.StudentService;
 public class StudentController {
 
     private final GeneralService generalService;
+    private final StudentService studentService;
 
-    public StudentController(GeneralService generalService){
+    public StudentController(GeneralService generalService, StudentService studentService){
         this.generalService = generalService;
+        this.studentService = studentService;
     }
     
     @PostMapping("/enroll")
@@ -28,8 +32,17 @@ public class StudentController {
         Long telegramId = student.getTelegramId();
         if(!StudentService.SCHEDULES.containsKey(telegramId)) 
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        generalService.enrollStudent(tutorTelegramId, student, StudentService.SCHEDULES.get(telegramId));
+        generalService.enrollStudent(tutorTelegramId, student);
         return new ResponseEntity<>("Student has been successfully saved to the database", 
         HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("/delete/{telegramId}")
+    public ResponseEntity<String> deleteStudent(@PathVariable Long telegramId){
+        if(!studentService.containsStudent(telegramId))
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        generalService.deleteStudent(telegramId);
+        return new ResponseEntity<>("the student and all associated scheduled classes " + 
+        "have been removed from the database", HttpStatus.OK);
     }
 }

@@ -4,6 +4,7 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -59,20 +60,6 @@ public class TutorService {
         return tutorRepository.findByTelegramIdWithAvailabilities(telegramId);
     }
 
-    @Transactional(propagation = Propagation.MANDATORY)
-    void updateTutorAvailabilities(Tutor tutor, List<Schedule> schedules){
-        List<Availability> availabilities = tutor.getAvailabilities();
-        for (var lesson : schedules) {
-            Availability interval = availabilities.stream()
-                .filter(a -> a.getDayOfWeek().equals(lesson.getDayOfWeek()) &&
-                !a.getStartTime().isAfter(lesson.getStartTime()) &&
-                !a.getEndTime().isBefore(lesson.getStartTime().plusHours(1)))
-                .findFirst().get();
-            adjustAvailability(interval, lesson, availabilities);
-        }
-        availabilityRepository.saveAll(availabilities);
-    }
-
     private boolean isTutorAvailableForLesson(Tutor tutor, Schedule lesson) {
         LocalTime endTime = lesson.getStartTime().plusHours(1);
         return tutor.getAvailabilities().stream().anyMatch(availability ->
@@ -81,7 +68,30 @@ public class TutorService {
         !endTime.isAfter(availability.getEndTime()));
     }
 
-    private void adjustAvailability(Availability interval, Schedule lesson, 
+    @Transactional(propagation = Propagation.MANDATORY)
+    void updateTutorAvailabilities(Tutor tutor, List<Schedule> schedules, boolean creating){
+        List<Availability> availabilities = tutor.getAvailabilities();
+        for (var lesson : schedules) {
+            if (creating) {
+                Availability interval = availabilities.stream()
+                    .filter(a -> a.getDayOfWeek().equals(lesson.getDayOfWeek()) &&
+                    !a.getStartTime().isAfter(lesson.getStartTime()) &&
+                    !a.getEndTime().isBefore(lesson.getStartTime().plusHours(1)))
+                    .findFirst().orElse(null);
+                reduceAvailability(interval, lesson, availabilities);
+            } else {
+                List<Availability> intervals = availabilities.stream()
+                    .filter(a -> a.getDayOfWeek().equals(lesson.getDayOfWeek()) &&
+                    (lesson.getStartTime().equals(a.getEndTime()) ||
+                    lesson.getStartTime().plusHours(1).equals(a.getStartTime())))
+                    .collect(Collectors.toList());
+                restoreAvailability(intervals, lesson, availabilities);
+            }
+        }
+        availabilityRepository.saveAll(availabilities);
+    }
+
+    private void reduceAvailability(Availability interval, Schedule lesson, 
     List<Availability> availabilities){
         LocalTime lessonStart = lesson.getStartTime();
         LocalTime lessonEnd = lessonStart.plusHours(1);
@@ -99,6 +109,35 @@ public class TutorService {
             newInterval.setTutor(interval.getTutor());
             interval.setEndTime(lessonStart);
             availabilities.add(newInterval);
+        }
+    }
+
+    private void restoreAvailability(List<Availability> intervals, Schedule lesson,
+    List<Availability> availabilities){
+        LocalTime lessonStart = lesson.getStartTime();
+        LocalTime lessonEnd = lessonStart.plusHours(1);
+        switch(intervals.size()){
+            case 2 -> {
+                Availability first = intervals.get(0).getStartTime()
+                .isBefore(intervals.get(1).getStartTime()) ? intervals.get(0) : intervals.get(1);
+                Availability second = first == intervals.get(0) ? intervals.get(1) : intervals.get(0);
+                first.setEndTime(second.getEndTime());
+                availabilities.remove(second);
+            }
+            case 1 -> {
+                Availability interval = intervals.getFirst();
+                if (lessonStart.equals(interval.getEndTime()))
+                    interval.setEndTime(lessonEnd);
+                else interval.setStartTime(lessonStart);
+            }
+            case 0 -> {
+                Availability newInterval = new Availability();
+                newInterval.setDayOfWeek(lesson.getDayOfWeek());
+                newInterval.setStartTime(lessonStart);
+                newInterval.setEndTime(lessonEnd);
+                newInterval.setTutor(availabilities.getFirst().getTutor());
+                availabilities.add(newInterval);
+            }
         }
     }
 }

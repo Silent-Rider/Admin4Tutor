@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.admin4tutor.bot.dto.Availability;
-import com.admin4tutor.bot.dto.Lesson;
+import com.admin4tutor.bot.dto.Schedule;
 import com.admin4tutor.bot.dto.Student;
 import com.admin4tutor.bot.dto.Tutor;
 
@@ -25,15 +25,15 @@ public class DTOUtils {
         return availabilities;
     }
 
-    static List<Lesson> getLessons(Student student){
-        List<Lesson> lessons = new ArrayList<>();
+    static List<Schedule> getSchedules(Student student){
+        List<Schedule> schedules = new ArrayList<>();
         for(var dayOfWeek: student.getSchedule().keySet()){
-            Lesson lesson = Lesson.builder()
+            Schedule schedule = Schedule.builder()
             .startTime(student.getSchedule().get(dayOfWeek))
             .dayOfWeek(dayOfWeek)
             .build();
-            lessons.add(lesson);
+            schedules.add(schedule);
         }
-        return lessons;
+        return schedules;
     }
 }

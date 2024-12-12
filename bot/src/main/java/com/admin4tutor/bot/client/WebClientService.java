@@ -9,7 +9,7 @@ import org.springframework.web.reactive.function.client.WebClientRequestExceptio
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import com.admin4tutor.bot.dto.Availability;
-import com.admin4tutor.bot.dto.Lesson;
+import com.admin4tutor.bot.dto.Schedule;
 import com.admin4tutor.bot.dto.Student;
 import com.admin4tutor.bot.dto.Tutor;
 import com.admin4tutor.bot.dto.User;
@@ -41,7 +41,7 @@ public class WebClientService {
     }
 
     public List<Tutor> getSuitableTutors(Student student){
-        List<Lesson> lessons = DTOUtils.getLessons(student);
+        List<Schedule> schedules = DTOUtils.getSchedules(student);
         List<Tutor> tutors = null;
         try{
             tutors = webClient.post()
@@ -53,7 +53,7 @@ public class WebClientService {
                 .queryParam("telegramId", student.getTelegramId())
                 .build(); })
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(lessons)
+            .bodyValue(schedules)
             .accept(MediaType.APPLICATION_JSON)
             .retrieve()
             .bodyToFlux(Tutor.class)

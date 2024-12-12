@@ -31,4 +31,7 @@ public class Schedule {
     @Column(name = "start_time", nullable = false)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
     private LocalTime startTime;
+
+    @Transient
+    private String studentName;
 }

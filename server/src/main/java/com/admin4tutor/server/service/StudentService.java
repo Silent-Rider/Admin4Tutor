@@ -26,10 +26,23 @@ public class StudentService {
     private ScheduleRepository scheduleRepository;
     
     @Transactional(propagation = Propagation.MANDATORY)
-    void addStudent(Student student, List<Schedule> schedules, Tutor tutor){
+    void addStudent(Student student, Tutor tutor){
         student.setTutor(tutor);
         studentRepository.save(student);
+        List<Schedule> schedules = SCHEDULES.get(student.getTelegramId());
         schedules.forEach(x -> x.setStudent(student));
         scheduleRepository.saveAll(schedules);
+    }
+
+    public boolean containsStudent(Long telegramId){
+        return studentRepository.existsByTelegramId(telegramId);
+    }
+
+    public Student getStudentByTelegramId(Long telegramId){
+        return studentRepository.findByTelegramIdWithSchedules(telegramId);
+    }
+
+    public void deleteStudent(Student student){
+        
     }
 }

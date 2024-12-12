@@ -5,9 +5,11 @@ import lombok.Data;
 
 @Data
 @Builder
-public class Lesson {
+public class Schedule {
 
     private String startTime;
 
     private DayOfWeek dayOfWeek;
+
+    private String studentName;
 }
