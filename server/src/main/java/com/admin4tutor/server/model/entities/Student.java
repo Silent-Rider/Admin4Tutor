@@ -46,8 +46,12 @@ public class Student {
     private LocalDateTime createdAt = LocalDateTime.now();
 
     @JsonIgnore
-    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "student", cascade = CascadeType.PERSIST)
     private List <Lesson> lessons;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
+    private List <Schedule> schedules;
 
     @JsonIgnore
     @ManyToOne

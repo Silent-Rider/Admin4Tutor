@@ -9,38 +9,47 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.admin4tutor.server.controller.LessonTemplate;
 import com.admin4tutor.server.model.Status;
 import com.admin4tutor.server.model.entities.Lesson;
+import com.admin4tutor.server.model.entities.Schedule;
 import com.admin4tutor.server.model.entities.Student;
 import com.admin4tutor.server.model.entities.Tutor;
+import com.admin4tutor.server.service.repositories.LessonRepository;
 
 @Service
-public class EnrollmentService {
+public class GeneralService {
 
     @Autowired
     private TutorService tutorService;
     @Autowired
     private StudentService studentService;
+    @Autowired
+    private LessonRepository lessonRepository;
 
     @Transactional
-    public void enrollStudent(Long tutorTelegramId, Student student, List<LessonTemplate> schedule){
+    public void enrollStudent(Long tutorTelegramId, Student student, List<Schedule> schedules){
         Tutor tutor = tutorService.getTutorByTelegramId(tutorTelegramId);
-        List<Lesson> lessons = createLessons(schedule);
-        studentService.addStudent(student, lessons, tutor);
-        tutorService.updateTutorAvailabilities(tutor, schedule);
+        List<Lesson> lessons = createLessons(schedules);
+        studentService.addStudent(student, schedules, tutor);
+        tutorService.updateTutorAvailabilities(tutor, schedules);
+        lessons.forEach(lesson -> {
+            lesson.setTutor(tutor);
+            lesson.setStudent(student);
+            lesson.setLanguage(tutor.getLanguage());
+        });
+        lessonRepository.saveAll(lessons);
     }
 
-    private List<Lesson> createLessons(List<LessonTemplate> schedule){
+    private List<Lesson> createLessons(List<Schedule> schedules){
         List<Lesson> lessons = new ArrayList<>();
         LocalDate today = LocalDate.now();
         for(int i = 0; i < 4; i++){
-            for(var template: schedule){
+            for(var schedule: schedules){
                 Lesson lesson = new Lesson();
-                lesson.setStartTime(template.getStartTime());
-                lesson.setEndTime(template.getStartTime().plusHours(1));
+                lesson.setStartTime(schedule.getStartTime());
+                lesson.setEndTime(schedule.getStartTime().plusHours(1));
                 lesson.setStatus(Status.SCHEDULED);
-                lesson.setLessonDate(today.with(TemporalAdjusters.next(template.getDayOfWeek())));
+                lesson.setLessonDate(today.with(TemporalAdjusters.next(schedule.getDayOfWeek())));
                 lessons.add(lesson);
             }
             today = today.plusWeeks(1);

@@ -10,9 +10,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.admin4tutor.server.controller.LessonTemplate;
 import com.admin4tutor.server.model.Language;
 import com.admin4tutor.server.model.entities.Availability;
+import com.admin4tutor.server.model.entities.Schedule;
 import com.admin4tutor.server.model.entities.Tutor;
 import com.admin4tutor.server.service.repositories.AvailabilityRepository;
 import com.admin4tutor.server.service.repositories.TutorRepository;
@@ -20,7 +20,7 @@ import com.admin4tutor.server.service.repositories.TutorRepository;
 @Service
 public class TutorService {
 
-    private final Map<Long, Tutor> pendingTutors = new ConcurrentHashMap<>();
+    private static final Map<Long, Tutor> PENDING_TUTORS = new ConcurrentHashMap<>();
 
     @Autowired
     private TutorRepository tutorRepository;
@@ -28,24 +28,24 @@ public class TutorService {
     private AvailabilityRepository availabilityRepository;
 
     public void addTutor(Long telegramId, Tutor tutor){
-        pendingTutors.put(telegramId, tutor);
+        PENDING_TUTORS.put(telegramId, tutor);
     }
 
     @Transactional
     public Tutor saveAvailabilities(Long telegramId, List<Availability> availabilities){
-        Tutor tutor = pendingTutors.get(telegramId);
+        Tutor tutor = PENDING_TUTORS.get(telegramId);
         tutorRepository.save(tutor);
         availabilities.forEach(x -> x.setTutor(tutor));
         availabilityRepository.saveAll(availabilities);
-        return pendingTutors.remove(telegramId);
+        return PENDING_TUTORS.remove(telegramId);
     }
 
-    public List<Tutor> getAvailableTutorsByLanguage(List<LessonTemplate> lessons, Language language){
+    public List<Tutor> getAvailableTutorsByLanguage(List<Schedule> schedules, Language language){
         List<Tutor> tutors = tutorRepository.findByLanguageWithAvailabilities(language);
         if(tutors.isEmpty()) return tutors;
         tutorLoop: for(int i = 0; i < tutors.size(); i++){
             Tutor tutor = tutors.get(i);
-            for(LessonTemplate lesson: lessons){
+            for(Schedule lesson: schedules){
                 if(!isTutorAvailableForLesson(tutor, lesson)){
                     tutors.remove(tutor);
                     continue tutorLoop;
@@ -60,9 +60,9 @@ public class TutorService {
     }
 
     @Transactional(propagation = Propagation.MANDATORY)
-    void updateTutorAvailabilities(Tutor tutor, List<LessonTemplate> schedule){
+    void updateTutorAvailabilities(Tutor tutor, List<Schedule> schedules){
         List<Availability> availabilities = tutor.getAvailabilities();
-        for (var lesson : schedule) {
+        for (var lesson : schedules) {
             Availability interval = availabilities.stream()
                 .filter(a -> a.getDayOfWeek().equals(lesson.getDayOfWeek()) &&
                 !a.getStartTime().isAfter(lesson.getStartTime()) &&
@@ -73,7 +73,7 @@ public class TutorService {
         availabilityRepository.saveAll(availabilities);
     }
 
-    private boolean isTutorAvailableForLesson(Tutor tutor, LessonTemplate lesson) {
+    private boolean isTutorAvailableForLesson(Tutor tutor, Schedule lesson) {
         LocalTime endTime = lesson.getStartTime().plusHours(1);
         return tutor.getAvailabilities().stream().anyMatch(availability ->
         availability.getDayOfWeek().equals(lesson.getDayOfWeek()) &&
@@ -81,7 +81,7 @@ public class TutorService {
         !endTime.isAfter(availability.getEndTime()));
     }
 
-    private void adjustAvailability(Availability interval, LessonTemplate lesson, 
+    private void adjustAvailability(Availability interval, Schedule lesson, 
     List<Availability> availabilities){
         LocalTime lessonStart = lesson.getStartTime();
         LocalTime lessonEnd = lessonStart.plusHours(1);

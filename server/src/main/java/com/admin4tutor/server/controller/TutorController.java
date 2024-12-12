@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.admin4tutor.server.model.Language;
 import com.admin4tutor.server.model.entities.Availability;
+import com.admin4tutor.server.model.entities.Schedule;
 import com.admin4tutor.server.model.entities.Tutor;
+import com.admin4tutor.server.service.StudentService;
 import com.admin4tutor.server.service.TutorService;
 
 
@@ -43,9 +45,9 @@ public class TutorController{
 
     @PostMapping("/search")
     public ResponseEntity<List<Tutor>> getSuitableTutors(@RequestParam Language language, 
-    @RequestParam Long telegramId, @RequestBody List<LessonTemplate> lessons){
+    @RequestParam Long telegramId, @RequestBody List<Schedule> lessons){
         List<Tutor> tutors = tutorService.getAvailableTutorsByLanguage(lessons, language);
-        LessonTemplate.SCHEDULES.put(telegramId, lessons);
+        StudentService.SCHEDULES.put(telegramId, lessons);
         return new ResponseEntity<>(tutors, HttpStatus.OK);
     }    
 }

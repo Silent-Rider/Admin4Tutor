@@ -70,6 +70,7 @@ public class TelegramBot extends TelegramLongPollingBot {
             } else {
                 sessionManager.handleUserAnswer(chatId, text);
             }
+            System.out.println(message.getFrom().getUserName());
         } else if(update.hasCallbackQuery()){
             CallbackQuery query = update.getCallbackQuery();
             long chatId = query.getMessage().getChatId();

@@ -9,25 +9,26 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.admin4tutor.server.model.entities.Student;
-import com.admin4tutor.server.service.EnrollmentService;
+import com.admin4tutor.server.service.GeneralService;
+import com.admin4tutor.server.service.StudentService;
 
 @RequestMapping("/students")
 @RestController
 public class StudentController {
 
-    private final EnrollmentService enrollmentService;
+    private final GeneralService generalService;
 
-    public StudentController(EnrollmentService studentService){
-        this.enrollmentService = studentService;
+    public StudentController(GeneralService generalService){
+        this.generalService = generalService;
     }
     
     @PostMapping("/enroll")
     public ResponseEntity<String> enrollStudent(@RequestParam Long tutorTelegramId,
     @RequestBody Student student) {
         Long telegramId = student.getTelegramId();
-        if(!LessonTemplate.SCHEDULES.containsKey(telegramId)) 
+        if(!StudentService.SCHEDULES.containsKey(telegramId)) 
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        enrollmentService.enrollStudent(tutorTelegramId, student, LessonTemplate.SCHEDULES.get(telegramId));
+        generalService.enrollStudent(tutorTelegramId, student, StudentService.SCHEDULES.get(telegramId));
         return new ResponseEntity<>("Student has been successfully saved to the database", 
         HttpStatus.CREATED);
     }
