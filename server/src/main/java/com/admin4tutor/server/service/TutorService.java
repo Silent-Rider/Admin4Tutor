@@ -1,5 +1,6 @@
 package com.admin4tutor.server.service;
 
+import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
@@ -71,21 +72,22 @@ public class TutorService {
     @Transactional(propagation = Propagation.MANDATORY)
     void updateTutorAvailabilities(Tutor tutor, List<Schedule> schedules, boolean creating){
         List<Availability> availabilities = tutor.getAvailabilities();
+        Map<DayOfWeek, List<Availability>> availabilitiesByDay = availabilities.stream()
+        .collect(Collectors.groupingBy(Availability::getDayOfWeek));
         for (var lesson : schedules) {
+            List<Availability> dayAvailabilities = availabilitiesByDay.get(lesson.getDayOfWeek());
             if (creating) {
-                Availability interval = availabilities.stream()
-                    .filter(a -> a.getDayOfWeek().equals(lesson.getDayOfWeek()) &&
-                    !a.getStartTime().isAfter(lesson.getStartTime()) &&
-                    !a.getEndTime().isBefore(lesson.getStartTime().plusHours(1)))
-                    .findFirst().orElse(null);
+                Availability interval = dayAvailabilities.stream()
+                    .filter(a -> !a.getStartTime().isAfter(lesson.getStartTime()) &&
+                                !a.getEndTime().isBefore(lesson.getStartTime().plusHours(1)))
+                    .findFirst().get();
                 reduceAvailability(interval, lesson, availabilities);
             } else {
-                List<Availability> intervals = availabilities.stream()
-                    .filter(a -> a.getDayOfWeek().equals(lesson.getDayOfWeek()) &&
-                    (lesson.getStartTime().equals(a.getEndTime()) ||
-                    lesson.getStartTime().plusHours(1).equals(a.getStartTime())))
+                List<Availability> intervals = dayAvailabilities.stream()
+                    .filter(a -> lesson.getStartTime().equals(a.getEndTime()) ||
+                                lesson.getStartTime().plusHours(1).equals(a.getStartTime()))
                     .collect(Collectors.toList());
-                restoreAvailability(intervals, lesson, availabilities);
+                restoreAvailability(intervals, lesson, availabilities, tutor);
             }
         }
         availabilityRepository.saveAll(availabilities);
@@ -113,7 +115,7 @@ public class TutorService {
     }
 
     private void restoreAvailability(List<Availability> intervals, Schedule lesson,
-    List<Availability> availabilities){
+    List<Availability> availabilities, Tutor tutor){
         LocalTime lessonStart = lesson.getStartTime();
         LocalTime lessonEnd = lessonStart.plusHours(1);
         switch(intervals.size()){
@@ -125,9 +127,8 @@ public class TutorService {
                 availabilities.remove(second);
             }
             case 1 -> {
-                Availability interval = intervals.getFirst();
-                if (lessonStart.equals(interval.getEndTime()))
-                    interval.setEndTime(lessonEnd);
+                Availability interval = intervals.get(0);
+                if (lessonStart.equals(interval.getEndTime())) interval.setEndTime(lessonEnd);
                 else interval.setStartTime(lessonStart);
             }
             case 0 -> {
@@ -135,7 +136,7 @@ public class TutorService {
                 newInterval.setDayOfWeek(lesson.getDayOfWeek());
                 newInterval.setStartTime(lessonStart);
                 newInterval.setEndTime(lessonEnd);
-                newInterval.setTutor(availabilities.getFirst().getTutor());
+                newInterval.setTutor(tutor);
                 availabilities.add(newInterval);
             }
         }

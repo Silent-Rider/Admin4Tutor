@@ -34,15 +34,13 @@ public class StudentService {
         scheduleRepository.saveAll(schedules);
     }
 
-    public boolean containsStudent(Long telegramId){
-        return studentRepository.existsByTelegramId(telegramId);
-    }
-
     public Student getStudentByTelegramId(Long telegramId){
         return studentRepository.findByTelegramIdWithSchedules(telegramId);
     }
 
-    public void deleteStudent(Student student){
-        
+    @Transactional(propagation = Propagation.MANDATORY)
+    void deleteStudent(Student student){
+        SCHEDULES.remove(student.getTelegramId());
+        studentRepository.delete(student);
     }
 }

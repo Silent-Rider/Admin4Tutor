@@ -39,10 +39,11 @@ public class StudentController {
 
     @DeleteMapping("/delete/{telegramId}")
     public ResponseEntity<String> deleteStudent(@PathVariable Long telegramId){
-        if(!studentService.containsStudent(telegramId))
+        Student student = studentService.getStudentByTelegramId(telegramId);
+        if(student == null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        generalService.deleteStudent(telegramId);
-        return new ResponseEntity<>("the student and all associated scheduled classes " + 
+        generalService.deleteStudent(student);
+        return new ResponseEntity<>("Student and all associated scheduled classes " + 
         "have been removed from the database", HttpStatus.OK);
     }
 }

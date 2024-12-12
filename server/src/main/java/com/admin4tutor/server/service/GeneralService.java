@@ -42,14 +42,13 @@ public class GeneralService {
     }
 
     @Transactional
-    public void deleteStudent(Long telegramId){
-        Student student = studentService.getStudentByTelegramId(telegramId);
+    public void deleteStudent(Student student){
         List<Schedule> schedules = student.getSchedules();
         List<Lesson> scheduledLessons = lessonRepository.findByStudentAndStatus(student, Status.SCHEDULED);
         studentService.deleteStudent(student);
         Tutor tutor = student.getTutor();
         tutorService.updateTutorAvailabilities(tutor, schedules, false);
-
+        lessonRepository.deleteAll(scheduledLessons);
     }
 
     private List<Lesson> createLessons(List<Schedule> schedules){
