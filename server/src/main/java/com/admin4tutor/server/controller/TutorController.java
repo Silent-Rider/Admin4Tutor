@@ -4,11 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.admin4tutor.server.model.Language;
 import com.admin4tutor.server.model.entities.Availability;
@@ -30,7 +26,7 @@ public class TutorController{
     
     @PostMapping
     public ResponseEntity<String> createTutor(@RequestBody Tutor tutor) {
-        tutorService.addTutor(tutor.getTelegramId(), tutor);
+        tutorService.addTutor(tutor);
         return new ResponseEntity<>("Tutor received, waiting for availabilities.", 
         HttpStatus.ACCEPTED);
     }
@@ -49,5 +45,15 @@ public class TutorController{
         List<Tutor> tutors = tutorService.getAvailableTutorsByLanguage(lessons, language);
         StudentService.SCHEDULES.put(telegramId, lessons);
         return new ResponseEntity<>(tutors, HttpStatus.OK);
-    }    
+    }
+    
+    @DeleteMapping("/delete/{telegramId}")
+    public ResponseEntity<String> deleteTutor(@PathVariable Long telegramId){
+        Tutor tutor = tutorService.getTutorByTelegramId(telegramId);
+        if(tutor == null)
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        tutorService.deleteTutor(tutor);
+        return new ResponseEntity<>("Tutor and all associated entitites " + 
+        "have been removed from the database", HttpStatus.OK);
+    }
 }

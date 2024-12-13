@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientRequestException;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import com.admin4tutor.bot.dto.Availability;
@@ -40,6 +39,30 @@ public class WebClientService {
         }
     }
 
+    public void deleteUser(User user){
+        String uri;
+        String successMessage = String.format("%s was successfully deleted from database",
+        user.getClass().getSimpleName());
+        String failureMessage = String.format("Error while attempting to make a %s delete request: ",
+        user.getClass().getSimpleName().toLowerCase());
+        if(user instanceof Tutor) uri = ServerEndpoints.TUTORS_URI;
+        else uri = ServerEndpoints.STUDENTS_URI;
+        try {
+            webClient.delete()
+            .uri(uriBuilder -> {
+                return uriBuilder
+                .path(uri + ServerEndpoints.DELETE + "/{telegramId}")
+                .build(String.valueOf(user.getTelegramId()));
+            })
+            .retrieve()
+            .toBodilessEntity()
+            .block();
+            log.info(successMessage);
+        } catch (WebClientResponseException e) {
+            log.error(failureMessage + e.getMessage());
+        }
+    }
+
     public List<Tutor> getSuitableTutors(Student student){
         List<Schedule> schedules = DTOUtils.getSchedules(student);
         List<Tutor> tutors = null;
@@ -60,7 +83,7 @@ public class WebClientService {
             .collectList()
             .block();
             log.info("List of tutors has been successfully received from server");
-        } catch(WebClientRequestException e){
+        } catch(WebClientResponseException e){
             log.error("Error while receiving list of tutors: " + e.getMessage());
         }
         return tutors;
@@ -117,7 +140,7 @@ public class WebClientService {
             .toBodilessEntity()
             .block();
             log.info("New student successfully sent to webserver");
-        } catch(WebClientRequestException e) {
+        } catch(WebClientResponseException e) {
             log.error("Error while sending student data: " + e.getMessage());
         }
     }

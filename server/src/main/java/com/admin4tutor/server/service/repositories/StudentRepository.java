@@ -11,5 +11,5 @@ import com.admin4tutor.server.model.entities.Student;
 public interface StudentRepository extends JpaRepository <Student, Long> {
 
     @Query("SELECT s FROM Student s JOIN FETCH s.schedules WHERE s.telegramId = :telegram_id")
-    Student findByTelegramIdWithSchedules(@Param("telegram_id")Long telegramId);
+    Student findByTelegramIdWithSchedules(@Param("telegram_id") Long telegramId);
 }

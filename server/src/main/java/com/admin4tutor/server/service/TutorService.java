@@ -29,8 +29,8 @@ public class TutorService {
     @Autowired
     private AvailabilityRepository availabilityRepository;
 
-    public void addTutor(Long telegramId, Tutor tutor){
-        PENDING_TUTORS.put(telegramId, tutor);
+    public void addTutor(Tutor tutor){
+        PENDING_TUTORS.put(tutor.getTelegramId(), tutor);
     }
 
     @Transactional
@@ -140,5 +140,10 @@ public class TutorService {
                 availabilities.add(newInterval);
             }
         }
+    }
+
+    @Transactional
+    public void deleteTutor(Tutor tutor){
+        tutorRepository.delete(tutor);
     }
 }

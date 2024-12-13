@@ -7,4 +7,5 @@ public class ServerEndpoints {
     static final String AVAILABILITIES = "/availabilities";
     static final String SEARCH = "/search";
     static final String ENROLL = "/enroll";
+    static final String DELETE = "/delete";
 }
